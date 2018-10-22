@@ -1,0 +1,388 @@
+#chartdiv {
+    width		: 97%;
+    height		: 500px;
+    font-size	: 11px;
+    text-align: center;
+}
+.center-block {
+    margin-left:auto;
+    margin-right:auto;
+    display:block;
+}
+.spacer-3-4 {
+    margin-top: 3px; /* define margin as you see fit */
+}
+.spacer-half {
+    margin-top: 6px; /* define margin as you see fit */
+}
+.spacer {
+    margin-top: 12px; /* define margin as you see fit */
+}
+.spacer-3x {
+    margin-top: 34px; /* define margin as you see fit */
+}
+.text-bold{
+    font-weight: bold;
+}
+.amcharts-guide tspan{
+    display: block;
+    width: 100%;
+    height: 44px;
+    padding: 5px 24px;
+    font-size: 18px;
+    line-height: 2;
+    color: #fff;
+    background-color: #222222;
+    background-image: none;
+    border: 1px solid #0f0f0f;
+    border-radius: 4px;
+
+    -webkit-text-fill-color: green; /* Will override color (regardless of order) */
+    -webkit-text-stroke-width: 20px;
+    -webkit-text-stroke-color: black;
+    font-weight: bold;
+}
+.amcharts-export-menu {
+    display: none;
+}
+.balance-container{
+  border-style: double;
+  border-color: #3daf43;
+  padding: 10px;
+}
+
+.full-width{
+  width: 100% !important;
+}
+.select_expiry{
+  margin-left: 12px;
+  cursor: pointer;
+}
+.spacer-2x{
+  margin-top: 24px;
+}
+
+.outline-primary{
+  background-color: transparent;
+  background-image: none;
+  border-color: #007bff;
+  color: #007bff;
+  transition: all .3s ease;
+  /*cursor: default;*/
+}
+.outline-primary:hover{
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+  /*cursor: default;*/
+}
+
+.outline-success{
+  background-color: transparent;
+  background-image: none;
+  border-color: #5cb85c;
+  color: #5cb85c;
+  transition: all .3s ease;
+  /*cursor: default;*/
+}
+.outline-success:hover{
+  background-color: #5cb85c;
+  color: #fff;
+  border-color: #5cb85c;
+  /*cursor: default;*/
+}
+
+.nopadding {
+   padding: 0 !important;
+   margin: 0 !important;
+}
+.trade-payout{
+  font-weight: bolder;
+  font-size: 1.5em !important;
+
+}
+.table-border{
+  border: solid 2px #f8f8f8;
+  border-radius: 15px;
+}
+.col-md-2-mod{
+  width: 14.66666667% !important;
+  float:right;
+}
+.container-fluid{
+  padding-left: 0 !important;
+}
+
+
+
+.full-width-sm{
+  width: auto !important;
+}
+
+.full-width-sm{
+  width: auto !important;
+}
+
+@media only screen and (min-width: 320px) {
+  .nb{
+    position: absolute;
+    left: -5px;
+    bottom: 1px;
+  }
+}
+
+@media only screen and (min-width: 993px) {
+  .nb{
+    position: absolute;
+    left: 5px;
+    bottom: 0px;
+  }
+}
+
+.icon-big{
+  font-size: 5em;
+}
+
+.heading{
+  font-size: 2em;
+}
+
+.profile-well{
+  min-height: 300px;
+}
+
+.modal-90{
+  width: 90% !important;
+}
+
+.display-none{
+  display: none !important;
+}
+
+::-webkit-input-placeholder {
+   text-align: center;
+}
+
+:-moz-placeholder { /* Firefox 18- */
+   text-align: center;
+}
+
+::-moz-placeholder {  /* Firefox 19+ */
+   text-align: center;
+}
+
+:-ms-input-placeholder {
+   text-align: center;
+}
+.container-login{
+  max-width: 650px;
+}
+.container-signup{
+  max-width: 650px;
+}
+.login-navbar{
+  background-color: #fff;
+  border-color: #f8f8f8;
+}
+.login-bg{
+  background-image: url("../img/bg.jpg");
+  background-size: cover;
+}
+.login-wrapper{
+  border: 10px solid rgba(0,162,0, 0.5);
+  margin-top: 15%;
+
+}
+.signup-wrapper{
+  border: 2px solid #BBBBBB;
+  margin-top: 15%;
+
+}
+.login-container{
+  background: #fff;
+  min-height: 450px;
+}
+.logo-header-navbar{
+  float: left;
+  margin: 24 24 24 256;
+}
+.logo-header{
+  float: left;
+  margin: 24px;
+}
+
+.login-line{
+  border-top: 3px solid #BBBBBB;
+  border-radius: 4px;
+}
+.login-header-text{
+  font-size: 1.5em;
+  color: #BBBBBB;
+}
+
+.footer {
+  color: #fff;
+  font-size: .8em;
+}
+
+.logo-page-header{
+  padding-left: 24px;
+}
+.switchery{
+  margin-top: 24px;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+
+.loader {
+  border: 8px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin .8s linear infinite; /* Safari */
+  animation: spin .8s linear infinite;
+  margin: auto;
+}
+
+#chartdiv .loader{
+  margin-top: 15%;
+  margin-bottom: 12px;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.back-button{
+  font-size: 2em;
+  cursor: pointer;
+}
+
+.profile-sub{
+  margin-left: -1366px;
+  max-width: 1366px;
+  transition: margin .3s ease;
+}
+
+.show-margin{
+  margin-left: 0;
+}
+.profile-container-body{
+  z-index: 5;
+}
+.profile-input-container-body{
+  z-index: 10
+}
+.modal-disclaimer{
+  border: 10px solid rgba(0,162,0, 0.5);
+  margin-top: 18%;
+}
+.template-text{
+  vertical-align: bottom;
+}
+.profile-dropdown-container{
+  min-height: 50px;
+}
+.profile-dropdown{
+  margin-top: 25px;
+}
+.live-trade-container{
+  margin-bottom: 24px;
+}
+.balance-mobile{
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+.balance-text{
+  font-size: 1.5em;
+  line-height: 2;
+  margin-right: 12px;
+}
+
+.login-input{
+  font-size: auto;
+  height: auto;
+  padding: 10px;
+  margin-bottom: auto;
+  width: auto;
+  border-radius: 0;
+}
+
+.login-btn{
+  width: auto;
+  height: auto;
+  font-size: auto;
+  font-weight: none;
+}
+
+.login-links{
+  font-size: auto;
+}
+
+@media screen and (max-width: 1330px) {
+  .container-login {
+    max-width: none;
+    width: 100%;
+  }
+  .container-signup{
+    max-width: 650px;
+  }
+  .login-container{
+    min-height: 950px;
+  }
+  .login-input{
+    font-size: 3em;
+    height: 150px;
+    width: 85% !important;
+    padding: 40px;
+    margin-bottom: 48px;
+  }
+  .login-btn{
+    width: 50%;
+    height: 96px;
+    font-size: 3em;
+    font-weight: bold;
+  }
+  .login-links{
+    font-size: 2em;
+  }
+
+}
+.market-btn{
+  width: 110% !important;
+}
+
+.profile-container-body{
+  word-wrap: break-word;
+}
+@media screen and (max-width: 1012px) {
+  .last-login-container{
+    margin-top: -250px;
+  }
+  .market-btn{
+    width: auto;
+  }
+
+}
+
+.table{
+  color: #333 !important;
+}
+
+.modal-dialog-mobile{
+  width: 99% !important;
+}
+
+.main-container{
+  -webkit-backface-visibility: hidden;
+  -webkit-transform: translateZ(0) scale(1.0, 1.0);
+}

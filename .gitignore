@@ -1,0 +1,4 @@
+vendor/*
+error_log
+Controller/error_log
+web_trader/

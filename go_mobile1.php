@@ -28,17 +28,22 @@ $mm240Class = 'btn-default';
 if(isset($_GET['c']) && $_GET['c'] != '1mm'){
   $tickInterval = $_GET['c'];
   if($tickInterval == '5mm'){
+    $tickSelected = '5M';
     $mm5Class = 'btn-primary';
   }else if($tickInterval == '30mm'){
+    $tickSelected = '30M';
     $mm30Class = 'btn-primary';
   }else if($tickInterval == '60mm'){
+    $tickSelected = '60M';
     $mm60Class = 'btn-primary';
   }else if($tickInterval == '240mm'){
+    $tickSelected = '240M';
     $mm240Class = 'btn-primary';
   }
 
 }else{
   $tickInterval = 'mm';
+  $tickSelected = '1M';
   $mm1Class = 'btn-primary';
 
 }
@@ -51,29 +56,53 @@ $urlParam = $_GET;
 
 $dateFrom = date('m/d/Y', strtotime('-7 days'));
 $dateTo = date('m/d/Y');
-
+$user = $users->getUserDataById($userSess['info']['id']);
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ZoloTrader</title>
+    <title>NanoPips</title>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <link href="assets/css/bootstrap.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" rel="stylesheet">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link href="//cdn.rawgit.com/noelboss/featherlight/1.7.9/release/featherlight.min.css" type="text/css" rel="stylesheet" />
     <script src="//cdn.rawgit.com/noelboss/featherlight/1.7.9/release/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
-    <script src="https://www.amcharts.com/lib/3/serial.js"></script>
-    <script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
-    <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
-    <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
+
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css" media="all" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.js"></script>
     <link rel="stylesheet" href="assets/css/switchery.min.css" />
     <link rel="stylesheet" href="assets/css/simple-line-icons.min.css" />
-    <link rel="stylesheet" href="assets/css/main.css?v=1.3" />
     <script src="assets/js/switchery.min.js"></script>
+    <script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+    <script src="https://www.amcharts.com/lib/3/serial.js"></script>
+    <script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+    <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
+    <?php
+    if(isset($_GET['template'])){
+      if($_GET['template'] == 'light'){
+        echo '<script src="https://www.amcharts.com/lib/3/themes/light.js"></script>';
+        echo '<link rel="stylesheet" href="assets/css/main.css?v=2.4" />';
+        $template = 'light';
+        $fillColor = '#000';
+        $textFill = '#fff';
+      }else{
+        echo '<script src="https://www.amcharts.com/lib/3/themes/black.js"></script>';
+        echo '<link rel="stylesheet" href="assets/css/main-dark.css?v=2.4" />';
+        $template = 'black';
+        $fillColor = '#fff';
+        $textFill = '#000';
+      }
+    }else{
+      echo '<script src="https://www.amcharts.com/lib/3/themes/light.js"></script>';
+      $template = 'light';
+      $fillColor = '#000';
+      $textFill = '#fff';
+      echo '<link rel="stylesheet" href="assets/css/main.css?v=2.4" />';
+    }
+    ?>
+
 
     <script>
         var zoomEvents = [];
@@ -88,57 +117,47 @@ $dateTo = date('m/d/Y');
     </script>
 </head>
 <body>
-<div class="container" style="padding-top:1%; width: 97%;">
-
-    <strong>
-        <font color='#13D384' size='5'>Zolo</font>
-        <font size='5'>Trader</font>
-    </strong> |  |
-
-    <a href='affiliate'>Affiliate</a> | <a href='logout.php'>Logout</a><br />
-
-
-</div>
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-md-12" style="text-align: right;">
-      <i class="fa fa-question-circle popOverTrigger-btcSwitch"></i>
-    </div>
-    <div class="col-md-12" style="text-align: right;">
-      BTC <input type="checkbox" class="js-switch  pull-right" id="btcSwitch" checked /> <span class="text-success">dm</span>BTC
-    </div>
-  </div>
-    <div class="row">
-      <div class="col-md-10 col-sm-10 col-xs-10 nopadding">
-
-        <div id="chartdiv" style="height: 860px;"><img src="assets/img/tenor.gif"></div>
+  <nav class="navbar navbar-default navbar-static-top login-navbar">
+    <div class="col-md-2 col-sm-3 col-xs-3">
+      <div class="logo-header logo-page-header">
+        <img src="assets/img/logo.png" style="width: 112px; height:32px;">
       </div>
-      <div class="col-md-2 col-md-2-mod col-sm-2 col-xs-2 nopadding">
-        <div class="col-md-12 col-sm-12 col-xs-12 spacer-2x text-center">
-          Balance <i class="fa fa-question-circle popOverTrigger"></i>
-          <br>
-          <div class="balance-loader text-center">
-              <img src="assets/img/tenor.gif" width="100" height="100">
-          </div>
-          <span  type="button" class=" balance-loader-display btn outline-primary full-width btn-small-text balance" data-value="nbtc" style="display: none; padding-left: 2px; padding-right: 2px;"><span class="userFunds">0.00</span></span>
-        </div>
-        <div class="col-md-12 col-sm-12 col-xs-12"></div>
-        <div class="col-md-6 col-sm-12 col-xs-12 spacer-3-4">
-            <button  class="btn btn-primary btn-sm full-width-sm full-width-md" id="getHistoryTrigger" title="Trade History">Trade History</button>
-        </div>
-        <div class="col-md-6 col-sm-12 col-xs-12 spacer-3-4">
-            <button  class="btn btn-primary btn-sm full-width btn-small-text" title="Profile" id="profileBtn">Profile</button>
-        </div>
-        <div class="col-md-12 col-sm-12 col-xs-12 spacer-2x text-center">
-          Timeframe
-          <br>
-          <button class="btn <?=$mm1Class?> btn-xs candle-select-range" data-value="1mm">1M</button>
-          <button class="btn <?=$mm5Class?> btn-xs candle-select-range" data-value="5mm">5M</button>
-          <button class="btn <?=$mm30Class?> btn-xs candle-select-range" data-value="30mm">30M</button>
-          <button class="btn <?=$mm60Class?> btn-xs candle-select-range" data-value="60mm">60M</button>
-          <button class="btn <?=$mm240Class?> btn-xs candle-select-range" data-value="240mm">240M</button>
-        </div>
-        <div class="col-md-6 col-sm-12 col-xs-12 spacer-2x text-center">
+    </div>
+    <div class="col-md-2 col-sm-2">
+      <div class=" pull-left">
+        <span class="template-text">D</span><input type="checkbox" class="js-switch  pull-left" id="btcSwitch" <?=(!isset($_GET['template']) || $_GET['template'] == 'light' ? 'checked' : '')?> /><span class="template-text">L</span>
+      </div>
+    </div>
+    <div class="col-md-2 col-sm-2 col-xs-2 profile-dropdown-container text-center pull-right">
+      <div class="btn-group profile-dropdown">
+          <button class="btn btn-default btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Profile <i class="icon icon-user"></i>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuDivider">
+            <li id="getHistoryTrigger"><a href="#">Trade History</a></li>
+            <li><a href="profile.php">Account</a></li>
+            <li><a href="#">Help</a></li>
+            <li><a href="logout.php">Logout</a></li>
+          </ul>
+      </div>
+      <?php
+        if($user['user_level'] == 'admin'){
+          echo '<a class="btn btn-default btn-lg profile-dropdown" href="admin/users.php"><i class="fa fa-gears"></i></a>';
+        }
+      ?>
+    </div>
+    <div class="col-md-3 col-sm-3 col-xs-3 spacer-2x text-center pull-right">
+      <div class="balance-loader text-center">
+          <div class="loader" style="width:50px; height: 50px;"></div>
+      </div>
+      <span  type="button" class="pull-right balance-loader-display btn btn-lg outline-primary btn-small-text balance balance-mobile" data-value="nbtc" style="display: none; padding-left: 2px; padding-right: 2px;">$<span class="userFunds">0.00</span></span>
+      <span class="balance-text pull-right display-none">Balance</span>
+    </div>
+  </nav>
+<div class="container-fluid">
+    <div class="row main-container">
+      <div class="col-md-12">
+        <div class="col-md-2 col-sm-2 col-xs-4 spacer text-center">
           Market
           <br>
           <div class="btn-group full-width">
@@ -158,10 +177,60 @@ $dateTo = date('m/d/Y');
                 <li><a href="#" class="select_coin" data-coin="LTC" data-pair="EUR">LTCEUR</a></li>
                 <li><a href="#" class="select_coin" data-coin="LTC" data-pair="JPY">LTCJPY</a></li>
                 <li><a href="#" class="select_coin" data-coin="XRP" data-pair="BTC">XRPBTC</a></li>
+
+                <li><a href="#" class="select_coin" data-coin="EDO" data-pair="USD">EDOUSD</a></li>
+                <li><a href="#" class="select_coin" data-coin="ETP" data-pair="USD">ETPUSD</a></li>
+                <li><a href="#" class="select_coin" data-coin="NEO" data-pair="USD">NEOUSD</a></li>
+                <li><a href="#" class="select_coin" data-coin="SAN" data-pair="USD">SANUSD</a></li>
+                <li><a href="#" class="select_coin" data-coin="ZEC" data-pair="USD">ZECUSD</a></li>
+                <li><a href="#" class="select_coin" data-coin="DASH" data-pair="USD">DASHUSD</a></li>
+                <li><a href="#" class="select_coin" data-coin="BCH" data-pair="BTC">BCHBTC</a></li>
+                <li><a href="#" class="select_coin" data-coin="EOS" data-pair="BTC">EOSBTC</a></li>
+                <li><a href="#" class="select_coin" data-coin="IOT" data-pair="BTC">IOTBTC</a></li>
+                <li><a href="#" class="select_coin" data-coin="OMG" data-pair="USD">OMGUSD</a></li>
+                <li><a href="#" class="select_coin" data-coin="XMR" data-pair="USD">XMRUSD</a></li>
+                <li><a href="#" class="select_coin" data-coin="BCH" data-pair="USD">BCHUSD</a></li>
+                <li><a href="#" class="select_coin" data-coin="DASH" data-pair="BTC">DASHBTC</a></li>
+                <li><a href="#" class="select_coin" data-coin="LTC" data-pair="BTC">LTCBTC</a></li>
+                <li><a href="#" class="select_coin" data-coin="SAN" data-pair="BTC">SANBTC</a></li>
+                <li><a href="#" class="select_coin" data-coin="EDO" data-pair="BTC">EDOBTC</a></li>
+                <li><a href="#" class="select_coin" data-coin="ETP" data-pair="BTC">ETPBTC</a></li>
+                <li><a href="#" class="select_coin" data-coin="NEO" data-pair="BTC">NEOBTC</a></li>
+                <li><a href="#" class="select_coin" data-coin="ZEC" data-pair="BTC">ZECBTC</a></li>
             </ul>
           </div>
         </div>
-        <div class="col-md-6 col-sm-12 col-xs-12 spacer-2x text-center">
+        <div class="col-md-2 col-sm-2 col-xs-4 spacer text-center">
+          Chart Time Frame
+          <br>
+          <div class="btn-group full-width">
+            <button type="button" class="btn btn-sm outline-primary dropdown-toggle full-width dropdown-filter" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <?php echo $tickSelected ?> <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu full-width">
+                <li><a href="#" class="candle-select-range" data-value="1mm">1M</a></li>
+                <li><a href="#" class="candle-select-range" data-value="5mm">5M</a></li>
+                <li><a href="#" class="candle-select-range" data-value="30mm">30M</a></li>
+                <li><a href="#" class="candle-select-range" data-value="60mm">60M</a></li>
+                <li><a href="#" class="candle-select-range" data-value="240mm">240M</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12 col-sm-12 col-xs-12 nopadding">
+        <div id="chartdiv" style="height: 860px;">
+          <div class="loader"></div>
+          This may take a few minutes.
+        </div>
+      </div>
+      <div class="col-md-12 col-sm-12 col-xs-12 " style="display: none;">
+          <div class="col-md-12 text-center">
+              <span style="font-size: 24px;"><span class="current_price"></span><span class="percent_status"><i class="fa"></i></span></span>
+          </div>
+      </div>
+      <div class="col-md-12 spacer-2x">
+        <div class="col-md-2 col-sm-2 col-xs-2  text-center">
           <span style="font-size: .8em;">Expiry Time</span>
           <br>
           <div class="btn-group full-width">
@@ -179,43 +248,33 @@ $dateTo = date('m/d/Y');
               </ul>
           </div>
         </div>
-        <div class="col-md-12 col-sm-12 col-xs-12 spacer-2x text-center">
-          <span class="leverage-display">Leverage = <span class=""><img src="assets/img/btc-logo.ico" style="width: 25px; height: 25px; margin-bottom: 5px;"></span><span class="current-exchange-price text-bold"></span> <i class="fa fa-question-circle popOverTrigger-leverage"></i></span>
+        <div class="col-md-2 col-sm-2 col-xs-2">
+          <span style="font-size: .8em;">Trade Amount</span>
           <br>
           <div class="form-inline">
             <input type="hidden" id="current_price">
             <input type="hidden" class="max-quadpips">
             <input type="hidden" class="max-dollar-price">
-              <input id="leverage" type="number" value='0.5' min='0.1' class="form-control" aria-label="3.5" style="width: 80%;"> <i class="fa fa-question-circle popOverTrigger-leverage-input"></i>
-
-        </div>
-        <div class="col-md-12 col-sm-12 col-xs-12 spacer-2x"></div>
-        <div class="col-md-12 col-sm-12 col-xs-12 spacer-2x"></div>
-        <div class="col-md-12 col-sm-12 col-xs-12 spacer-2x">
-          <button class="btn btn-success btn-lg full-width" style="font-size: 25px; height: 100px; font-weight: bold;" id='buy' >Buy</button>
-        </div>
-        <div class="col-md-12 col-sm-12 col-xs-12 spacer-2x">
-          <button class="btn btn-danger btn-lg full-width" style="font-size: 25px; height: 100px; font-weight: bold;" id='sell' >Sell</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-10 col-sm-10 col-xs-10">
-          <div class="col-md-12 text-center">
-              <span style="font-size: 24px;"><span class="current_price"></span><span class="percent_status"><i class="fa"></i></span></span>
+            <input id="leverage" type="text" value='1' class="form-control" aria-label="3.5" style="width: 80%;">
 
           </div>
         </div>
-    </div>
+        <div class="col-md-4 col-sm-4 col-xs-4">
+          <button class="btn btn-success btn-lg full-width" style="font-size: 25px; height: 100px; font-weight: bold;" id='buy' >Buy</button>
+        </div>
+        <div class="col-md-4 col-sm-4 col-xs-4">
+          <button class="btn btn-danger btn-lg full-width" style="font-size: 25px; height: 100px; font-weight: bold;" id='sell' >Sell</button>
+        </div>
+      </div>
 
-    <div class="row">
+
+    <div class="row spacer-2x">
         <div class="col-md-12">
-            <div class="col-md-6 col-md-offset-2 col-sm-12 table-border">
+            <div class="col-md-6 col-md-offset-2 col-sm-12 table-border live-trade-container spacer-2x">
               <div class="live-trade-loader text-center">
-                  <img src="assets/img/tenor.gif">
+                  <div class="loader" style="width:50px; height: 50px;"></div>
               </div>
-              <span><i class="fa fa-question-circle popOverTrigger-table pull-right"></i></span>
+
               <table class="table live-trade-table" style="display: none;">
                   <thead>
                   <tr>
@@ -239,297 +298,31 @@ $dateTo = date('m/d/Y');
 
 </div>
 
-<div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-90" role="document">
-    <div class="modal-content">
+<div class="modal fade" id="disclaimerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content modal-disclaimer">
       <div class="modal-body">
         <div class="row">
-          <div class="col-md-12">
-            <div class="profile-container-body">
-              <div class="col-md-6 col-sm-12">
-                <div class="well well-lg profile-well">
-                  <div class="row">
-                    <div class="col-md-3">
-                      <i class="icon-user icon-big"></i>
-                    </div>
-                    <div class="col-md-9">
-                      <div>
-                        <span class="heading"><?=$userSess['info']['email']?></span>
-                      </div>
-                      <div class="spacer">
-                        <span>Last login: <?=$userSess['log_history'][count($userSess['log_history'])-1]['date_time']?></span>
-                        <br>
-                        <span>IP address: <?=$userSess['log_history'][count($userSess['log_history'])-1]['ip_address']?></span>
-                      </div>
-                      <div class="spacer">
-                        <button class="btn outline-primary btn-lg full-width submitInfoBtn">Submit Information</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6 col-sm-12">
-                <div class="well well-lg profile-well">
-                  <div class="row">
-                    <div class="col-md-3">
-                      <i class="icon-envelope icon-big"></i>
-                    </div>
-                    <div class="col-md-9">
-                      <div>
-                        <span class="heading">Email Authentication</span>
-                      </div>
-                      <div class="spacer">
-                        <span>use for security validation.</span>
-                        <br>
-                        <span>&nbsp;</span>
-                      </div>
-                      <div class="spacer">
-                        <button class="btn outline-primary btn-lg full-width authenticationBtn">Enable</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6 col-sm-12">
-                <div class="well well-lg profile-well">
-                  <div class="row">
-                    <div class="col-md-3">
-                      <i class="icon-lock icon-big"></i>
-                    </div>
-                    <div class="col-md-9">
-                      <div>
-                        <span class="heading">Security</span>
-                      </div>
-                      <div class="spacer">
-                        <button class="btn outline-primary btn-lg full-width changePasswordBtn">Change Password</button>
-                      </div>
-                      <div class="spacer">
-                        <button class="btn outline-primary btn-lg full-width changeSecretQuestionBtn">Change Secret Questions</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6 col-sm-12">
-                <div class="well well-lg profile-well">
-                  <div class="row">
-                    <div class="col-md-3">
-                      <i class="icon-user-following icon-big"></i>
-                    </div>
-                    <div class="col-md-9">
-                      <div>
-                        <span class="heading">Account</span>
-                      </div>
-                      <div class="spacer">
-                        <button class="btn outline-primary btn-lg full-width depositWithdrawBtn" data-action="deposit">Deposit Crypto</button>
-                      </div>
-                      <div class="spacer">
-                        <button class="btn outline-primary btn-lg full-width depositWithdrawBtn" data-action="withdraw">Withdraw Crypto</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="spacer col-md-12"><span class="heading">Last Login</span></div>
-              <div class="col-md-12 col-sm-12">
-                <div class="well well-lg profile-well">
-                  <div class="row">
-                    <div class="col-md-12">
-                      <table class="table">
-                        <thead>
-                          <tr>
-                            <th class="text-center">Date</th>
-                            <th class="text-center">Ip Address</th>
-                            <th class="text-center">Location</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <?php
-                            for($x = 0; $x < count($userSess['log_history']); $x++){
-                              echo '<tr class="text-center">
-                                      <td>'.$userSess['log_history'][$x]['date_time'].'</td>
-                                      <td>'.$userSess['log_history'][$x]['ip_address'].'</td>
-                                      <td>'.$userSess['log_history'][$x]['region'].', '.$userSess['log_history'][$x]['location'].'</td>
-                                    </tr>';
-                            }
-                          ?>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="profile-input-container-body profile-sub display-none">
-              <form enctype="multipart/form-data" id="profile_form">
-              <div class="col-md-12 spacer">
-                <input type="text" class="form-control" id="profile_first_name" name="profile_first_name" value="<?=$userSess['info']['first_name']?>" placeholder="First Name *">
-              </div>
-              <div class="col-md-12 spacer">
-                <input type="text" class="form-control" id="profile_last_name" name="profile_last_name" value="<?=$userSess['info']['last_name']?>" placeholder="Last Name">
-              </div>
-              <div class="col-md-12 spacer">
-                <input type="text" class="form-control" id="profile_address" name="profile_address" value="<?=$userSess['info']['address']?>" placeholder="Address">
-              </div>
-              <div class="col-md-12 spacer">
-                <p>Please upload:</p>
-                <p>1 Valid Government Issued Photo ID</p>
-                <p>1 Valid Proof of Address within the past 60 days.</p>
-              </div>
-              <div class="col-md-12">
-                <input name="profile_files[]" type="file" class="file" multiple data-show-upload="true" data-show-caption="true">
-                <p class="help-block">Try selecting more than one file when browsing for files.</p>
-              </div>
-              <div class="col-md-12 spacer text-center">
-                <button type="submit" class="btn btn-primary btn-lg submit_form_btn">Send</button>
-              </div>
-            </form>
-            </div>
-
-
-            <!-- authentication -->
-            <div class="authentication-container-body profile-sub display-none text-center">
-              <div class="authentication-loader">
-                <img src="assets/img/tenor.gif">
-              </div>
-              <div class="authentication-input-body display-none">
-                <div class="col-md-4 col-md-offset-4 spacer">
-                  <h1>Enter the 6 digit code</h1>
-                  <input type="text" class="form-control authentication-code" placeholder="CODE">
-                </div>
-                <div class="col-md-12 spacer text-center">
-                  <button type="button" class="btn btn-primary btn-lg authentication-code-send">Send</button>
-                </div>
-              </div>
-              <div class="authentication-response-body display-none">
-                <div class="col-md-4- col-md-offset-0 spacer">
-                </div>
-                <div class="col-md-12 spacer text-center authentication-resend-button hide-on-profile-init display-none">
-                  <button class="btn btn-primary authenticationBtn">Resend</button>
-                </div>
-                <div class="col-md-12 spacer text-center authentication-retry-button hide-on-profile-init display-none">
-                  <button class="btn btn-primary authenticationRetryBtn">Retry</button>
-                </div>
-              </div>
-            </div>
-
-
-            <!-- change password -->
-            <div class="change-password-container-body profile-sub display-none text-center">
-              <div class="change-security-loader display-none">
-                <img src="assets/img/tenor.gif">
-              </div>
-              <div class="change-security-container">
-                <div class="col-md-12 spacer text-center">
-                  <h1>Change Password</h1>
-                </div>
-                <div class="col-md-12 spacer">
-                  <input type="password" class="form-control" id="oldPassword" placeholder="Type old password">
-                </div>
-                <div class="col-md-12 spacer">
-                  <input type="password" class="form-control" id="password1" placeholder="Type new password">
-                </div>
-                <div class="col-md-12 spacer">
-                  <input type="password" class="form-control" id="password2" placeholder="Retype new password">
-                </div>
-                <div class="col-md-12 spacer text-center">
-                  <button class="btn btn-primary btn-lg confirmChangePasswordBtn">Update</button>
-                </div>
-              </div>
-            </div>
-
-            <!-- change secret -->
-            <div class="change-secret-container-body profile-sub display-none text-center">
-              <div class="change-secret-loader display-none">
-                <img src="assets/img/tenor.gif">
-              </div>
-              <div class="change-secret-container">
-                <div class="col-md-12 spacer text-center">
-                  <h1>Change Secrect Question</h1>
-                </div>
-                <div class="col-md-6 spacer">
-                  <select id="secretQuestions" class="form-control">
-                    <?php
-                      $userSecret = $users->getUserSecret($userSess['info']['id']);
-                      $secretQuestions = $users->getSecretQuestions();
-                      $qselected = '';
-                      foreach($secretQuestions as $a){
-                        if($a['id'] == $userSecret){
-                          $qselected = 'selected';
-                        }
-                        echo '<option value="'.$a['id'].'" '.$qselected.'>'.$a['question'].'</option>';
-                      }
-                    ?>
-                  </select>
-                </div>
-                <div class="col-md-6 spacer">
-                  <input type="text" class="form-control" id="secretAnswer" placeholder="Type answer">
-                </div>
-                <div class="col-md-12 spacer text-center">
-                  <button class="btn btn-primary btn-lg confirmChangeSecretBtn">Update</button>
-                </div>
-              </div>
-            </div>
-
-            <!-- deposit-withdraw -->
-            <div class="deposit-withdraw-container-body profile-sub display-none text-center">
-              <div class="deposit-withdraw-loader display-none">
-                <img src="assets/img/tenor.gif">
-              </div>
-              <div class="deposit-withdraw-container">
-                <div class="col-md-12 spacer text-center">
-                  <h1 class="deposit-withdraw-title"></h1>
-                </div>
-                <div class="col-md-3">
-                  <button class="btn btn-primary btn-lg confirmDepositWithdrawBtn"></button>
-                </div>
-                <div class="col-md-9">
-                  <div class="well well-lg profile-well">
-                    <div class="row">
-                      <div class="col-md-12">
-                        <table class="table">
-                          <thead>
-                            <tr>
-                              <th class="text-center">Date</th>
-                              <th class="text-center">Amount</th>
-                              <th class="text-center">ID</th>
-                              <th class="text-center">Notes</th>
-                            </tr>
-                          </thead>
-                          <tbody class="deposit-withdraw-history">
-
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="withdraw-container profile-sub display-none">
-              <div class="col-md-12">
-                <h3>Please fill your information.</h3>
-                <h3>A NanoPips Specialist will contact you shortly.</h3>
-              </div>
-              <div class="col-md-12 spacer">
-                <input type="text" class="form-control" id="fullName" placeholder="Full Name">
-              </div>
-              <div class="col-md-12 spacer">
-                <input type="text" class="form-control" id="address" placeholder="Address">
-              </div>
-              <div class="col-md-12 spacer">
-                <input type="number" class="form-control" id="widthdrawAmount" placeholder="Amount">
-              </div>
-              <div class="col-md-12 spacer text-center">
-                <button class="btn btn-primary btn-lg sendWithdrawRequest">Send</button>
-              </div>
-            </div>
+          <div class="col-md-12 text-center">
+            <h3>Disclaimer</h3>
+          </div>
+          <div class="col-md-12 text-justify">
+            <p>You are about to activate One Click Trading mode. By clicking "I Accept these Terms and Conditions" below, you acknowledge that you have read and understood the following terms and conditions, and you agree to be bound hereby. Your current version of the platform allows you to choose between the following modes for order submission. You agree that you will be bound by the procedures and conditions specified herein with respect to each such mode.</p>
+            <p>1. The Default mode for order submission is a two-step process: you first select a new market window then you select an order quantity amount to submit by clicking either Buy or Sell buttons depending on the particular market selected and your trading intentions. Your order will not be submitted until you have completed both of the aforementioned steps.</p>
+            <p>2. The One Click Trading mode for order submission is a one-step process. Your order will be submitted when you:</p>
+            <p>- click either bid (SELL) or ask (BUY) rate buttons on this platform on the right side panel.</p>
+            <p>THERE WILL BE NO SUBSEQUENT CONFIRMATION PROMPT FOR YOU TO CLICK. YOU WILL NOT BE ABLE TO WITHDRAW OR CHANGE YOUR ORDER ONCE YOU CLICK. UNDER NORMAL MARKET CONDITIONS AND SYSTEM PERFORMANCE, A MARKET ORDER WILL BE PROMPTLY FILLED AFTER SUBMISSION AND YOU WILL HAVE ENTERED INTO A BINDING TRANSACTION.</p>
+            <p>By activating this platform and the One Click Trading mode, you understand that your orders will be submitted by clicking the Buy or Sell buttons as described above, without any further order confirmation. You agree to accept all risks associated with the use of the order submission mode you have chosen, including, without limitation, the risk of errors, omissions or mistakes made in submitting any order.</p>
+            <p>You agree to fully indemnify and hold harmless NanoPips Inc. from any and all losses, costs and expenses that it may incur as a result of any such errors, omissions or mistakes by you, your trading manager or any other person inputting trades on the platform on your behalf. </p>
+          </div>
+          <div class="col-md-12 text-center spacer">
+            <button class="btn outline-success accept-disclaimer">I Accept These Terms & Conditions</button>
+          </div>
+          <div class="col-md-12 text-center spacer">
+            <a href="#" data-dismiss="modal" aria-label="Close">Cancel</a>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -540,10 +333,10 @@ $dateTo = date('m/d/Y');
       <div class="modal-body">
         <div class="row">
           <div class="col-md-12 text-center">
-            <h1>Error: No Funds Available</h1>
+            <h1>Error: Balance is below required margin amount</h1>
           </div>
           <div class="col-md-12 text-center" style="margin-top: 24px;">
-            <a href="buy-funds.php" class="btn btn-primary btn-lg">Deposit Now</a>
+            <a href="https://www.nanopips.com/funding.php" class="btn btn-primary btn-lg">Deposit Now</a>
           </div>
         </div>
       </div>
@@ -555,7 +348,7 @@ $dateTo = date('m/d/Y');
 
 <!-- Modal -->
 <div class="modal fade" id="tradeHistoryModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document" style="width: 80%;">
+  <div class="modal-dialog modal-dialog-mobile" role="document" style="width: 80%;">
     <div class="modal-content">
       <div class="modal-header">
         <div class="row">
@@ -582,6 +375,7 @@ $dateTo = date('m/d/Y');
                     <span class="fa fa-calendar"></span>
                 </div>
             </div>
+              <span class="pull-right" style="font-size: 1.5em;">Total P/L: <span class="totalPnL"></span></span>
           </div>
 
         </div>
@@ -590,7 +384,7 @@ $dateTo = date('m/d/Y');
         <div class="row">
           <div class="col-md-12">
             <div class="table-loader text-center">
-                <img src="assets/img/tenor.gif">
+                <div class="loader" style="width:50px; height: 50px;"></div>
             </div>
             <table class="table trade-table" style="display: none;">
               <thead>
@@ -598,7 +392,7 @@ $dateTo = date('m/d/Y');
                   <th scope="col">Entry Price</th>
                   <th scope="col">Position</th>
                   <th scope="col">Time</th>
-                  <th scope="col">Leverage</th>
+                  <th scope="col">Trade Amount</th>
                   <th scope="col">Exit Price</th>
                   <th scope="col">Time</th>
                   <th scope="col">Pair</th>
@@ -619,9 +413,36 @@ $dateTo = date('m/d/Y');
 
 
 <script type="text/javascript" language="JavaScript">
+    var atuEnabled = false;
+    var atuAction = '';
+    var atuP = 0;
     $(document).ready(function(){
-        $userId = <?php echo $userSess['info']['id']; ?>;
+      var _efx8 = <?=$user['accepted_terms']?>;
+      var totalTradeAmount = 0;
+      $userId = <?php echo $userSess['info']['id']; ?>;
+      if(_efx8 == false){
+        $('#disclaimerModal').modal('show');
+      }
+      $('.accept-disclaimer').click(function(){
+        $btn = $(this);
+        $btn.html('<i class="fa fa-spinner fa-spin"></i>');
+        $.ajax({
+            url: 'Controller/user.php?action=accept-terms',
+            type: 'post',
+            dataType: 'json',
+            success: function (r) {
+                $btn.html('I Accept These Terms & Conditions');
+                _efx8 = true;
+                $('#disclaimerModal').modal('hide');
+            },
+            data: {param: {userId: $userId}}
+        });
+      });
 
+
+      var btnSwitch = document.querySelector('.js-switch');
+      var templateSwitch = new Switchery(btnSwitch);
+      $('.switch-container').removeClass('display-none');
       $('.depositWithdrawBtn').click(function(){
         $action = $(this).attr('data-action');
         $('.profile-container-body').addClass('display-none');
@@ -841,9 +662,7 @@ $dateTo = date('m/d/Y');
       $('.date-to').datepicker({
           format: 'mm/dd/yyyy'
       });
-      var elem = document.querySelector('.js-switch');
-      var init = new Switchery(elem);
-      init.disable();
+
 
         $mm = '<?=$tickInterval?>';
         $('.sendWithdrawRequest').click(function(){
@@ -880,11 +699,14 @@ $dateTo = date('m/d/Y');
         });
 
         $('#profileBtn').click(function(){
+          /*
             $('.profile-container-body').removeClass('display-none');
             $('.profile-sub').addClass('display-none');
             $('.authentication-response-body').addClass('display-none');
             $('.hide-on-profile-init').addClass('display-none');
             $('#profileModal').modal('show');
+          */
+          location.href= "profile.php";
         });
 
         $('.popOverTrigger-btcSwitch').popover({
@@ -925,34 +747,76 @@ $dateTo = date('m/d/Y');
         });
 
         $tracks = new Object;
-        $tracks['track_0'] = ['amcharts-guide-live-guide', 'black'];
+        $tracks['track_0'] = ['amcharts-guide-live-guide', '<?=$fillColor?>'];
         localStorage.setItem("tracks", JSON.stringify($tracks));
         $tradeIndex = 0;
+
+
+
+        $('.select_coin').click(function(){
+            $urlParam = <?php echo json_encode($urlParam); ?>;
+            if(typeof $urlParam.c != 'undefined'){
+              $urlC = '&c='+$urlParam.c;
+            }else{
+              $urlC ='';
+            }
+            if(typeof $urlParam.template != 'undefined'){
+              $urlTemplate = '&template='+$urlParam.template;
+            }else{
+              $urlTemplate ='';
+            }
+            location.href = 'go2.php?coin='+$(this).attr('data-coin')+'&currency='+$(this).attr('data-pair')+$urlC+$urlTemplate;
+
+
+        });
+        $('.candle-select-range').click(function(){
+          $candleRange = $(this).attr('data-value');
+          $urlParam = <?php echo json_encode($urlParam); ?>;
+          if(typeof $urlParam.coin != 'undefined'){
+            $urlCoin = '&coin='+$urlParam.coin;
+          }else{
+            $urlCoin ='';
+          }
+          if(typeof $urlParam.currency != 'undefined'){
+            $urlCurrency = '&currency='+$urlParam.currency;
+          }else{
+            $urlCurrency ='';
+          }
+          if(typeof $urlParam.template != 'undefined'){
+            $urlTemplate = '&template='+$urlParam.template;
+          }else{
+            $urlTemplate ='';
+          }
+
+          location.href = 'go2.php?c='+$candleRange+$urlCoin+$urlCurrency+$urlTemplate
+
+
+        });
 
         // call History
 
 
 
         $.ajax({
-            url: 'Controller/history.php?action=load-history',
+            url: 'Controller/history2.php?action=load-history',
             type: 'post',
             dataType: 'json',
             success: function (rspdata) {
-              init.enable();
+              $maxTradeAmount = rspdata.maxTradeAmount;
               $('.balance-loader').css('display', 'none');
               $('.balance-loader-display').css('display', 'block');
-              $('.userFunds').html(rspdata.funds);
+              $('.userFunds').html(toFixedNew(rspdata.funds, 2));
               $isLoadedUpdate = false;
               $isLoadedAdd = false;
               $btcUsd = rspdata.currentBtcPrice;
               $currentBtcPrice = rspdata.currentBtcPrice;
-              $currentCoinPrice = toFixedNew(rspdata.currentCoinPrice, 6);
+              $currentCoinPrice = toFixedNew(rspdata.currentCoinPrice, 8);
               $cur = '<?php echo $currency; ?>';
               $currencyPair = '<?php echo $currencyPair; ?>';
               $userId = <?php echo $userSess['info']['id']; ?>;
               $coin = '<?php echo $filter; ?>';
               $cryptoCoin = '<?php echo $filter; ?>';
-              $maxQuadPrice = parseFloat(250 / $currentBtcPrice * 10000);
+              $maxQuadPrice = parseFloat($maxTradeAmount / $currentBtcPrice * 10000);
               $('.max-quadpips').val(toFixedNew($maxQuadPrice, 2));
               // Current Curreny Prices
               $pairPrices = {
@@ -967,7 +831,26 @@ $dateTo = date('m/d/Y');
                   LTCCNY: 0,
                   LTCEUR: 0,
                   LTCJPY: 0,
-                  XRPBTC: 0
+                  XRPBTC: 0,
+                  EDOUSD: 0,
+                  ETPUSD: 0,
+                  NEOUSD: 0,
+                  SANUSD: 0,
+                  ZECUSD: 0,
+                  DASHUSD: 0,
+                  BCHBTC: 0,
+                  EOSBTC: 0,
+                  IOTBTC: 0,
+                  OMGUSD: 0,
+                  XMRUSD: 0,
+                  BCHUSD: 0,
+                  DASHBTC: 0,
+                  LTCBTC: 0,
+                  SANBTC: 0,
+                  EDOBTC: 0,
+                  ETPBTC: 0,
+                  NEOBTC: 0,
+                  ZECBTC: 0
               };
               $.getJSON('Controller/crypto.php?action=get').done(function(pairs){
                   $.each(pairs, function (index, key) {
@@ -995,6 +878,44 @@ $dateTo = date('m/d/Y');
                           $pairPrices.LTCJPY = key.price;
                       }else if(key.pair == 'XRPBTC'){
                           $pairPrices.XRPBTC = key.price;
+                      }else if(key.pair == 'EDOUSD'){
+                          $pairPrices.EDOUSD = key.price;
+                      }else if(key.pair == 'ETPUSD'){
+                          $pairPrices.ETPUSD = key.price;
+                      }else if(key.pair == 'NEOUSD'){
+                          $pairPrices.NEOUSD = key.price;
+                      }else if(key.pair == 'SANUSD'){
+                          $pairPrices.SANUSD = key.price;
+                      }else if(key.pair == 'ZECUSD'){
+                          $pairPrices.ZECUSD = key.price;
+                      }else if(key.pair == 'DASHUSD'){
+                          $pairPrices.DASHUSD = key.price;
+                      }else if(key.pair == 'BCHBTC'){
+                          $pairPrices.BCHBTC = key.price;
+                      }else if(key.pair == 'EOSBTC'){
+                          $pairPrices.EOSBTC = key.price;
+                      }else if(key.pair == 'IOTBTC'){
+                          $pairPrices.IOTBTC = key.price;
+                      }else if(key.pair == 'OMGUSD'){
+                          $pairPrices.OMGUSD = key.price;
+                      }else if(key.pair == 'XMRUSD'){
+                          $pairPrices.XMRUSD = key.price;
+                      }else if(key.pair == 'BCHUSD'){
+                          $pairPrices.BCHUSD = key.price;
+                      }else if(key.pair == 'DASHBTC'){
+                          $pairPrices.DASHBTC = key.price;
+                      }else if(key.pair == 'LTCBTC'){
+                          $pairPrices.LTCBTC = key.price;
+                      }else if(key.pair == 'SANBTC'){
+                          $pairPrices.SANBTC = key.price;
+                      }else if(key.pair == 'EDOBTC'){
+                          $pairPrices.EDOBTC = key.price;
+                      }else if(key.pair == 'ETPBTC'){
+                          $pairPrices.ETPBTC = key.price;
+                      }else if(key.pair == 'NEOBTC'){
+                          $pairPrices.NEOBTC = key.price;
+                      }else if(key.pair == 'ZECBTC'){
+                          $pairPrices.ZECBTC = key.price;
                       }
 
                   });
@@ -1002,20 +923,18 @@ $dateTo = date('m/d/Y');
 
 
                   $('#leverage').on('change', function(){
-                    $maxQuadPips = parseFloat($('.max-quadpips').val());
+
                     $curFunds = parseFloat($('.userFunds').text());
 
                     if($(this).val() > $curFunds){
                       alert('You dont have enough funds');
-                      $(this).val($curFunds.toFixed(2));
+                      //$(this).val($curFunds.toFixed(2));
                     }
 
-                    if($(this).val() > $maxQuadPips){
-                        $(this).val($maxQuadPips.toFixed(2));
+                    if($(this).val() > $maxTradeAmount){
+                      alert('Maximum Trade Limit Exceeded. Reduce Trade Amount Size.');
+                      //$(this).val($maxTradeAmount);
                     }
-
-                  $currentExcPrice = $(this).val() / 10000;
-                  $('.current-exchange-price').text($currentExcPrice.toFixed(6));
               });
 
 
@@ -1034,32 +953,7 @@ $dateTo = date('m/d/Y');
 
 
               $('#current_price').val($currentCoinPrice);
-              $curExcPrice = $('#leverage').val() / 10000;
-              $('.current-exchange-price').text(toFixedNew($curExcPrice,6));
-              $('.select_coin').click(function(){
-                  location.href = 'go.php?coin='+$(this).attr('data-coin')+'&currency='+$(this).attr('data-pair');
-              });
-              $('.candle-select-range').click(function(){
-                $candleRange = $(this).attr('data-value');
-                $urlParam = <?php echo json_encode($urlParam); ?>;
-                console.log($urlParam);
 
-                if(typeof $urlParam.coin != 'undefined' && typeof $urlParam.currency != 'undefined'){
-                  if (screen.width <= 768) {
-                      location.href = 'go_mobile.php?coin='+$urlParam.coin+'&currency='+$urlParam.currency+'&c='+$candleRange
-                  }else{
-                      location.href = 'go.php?coin='+$urlParam.coin+'&currency='+$urlParam.currency+'&c='+$candleRange
-                  }
-                }else{
-                  if (screen.width <= 768) {
-                        location.href = 'go_mobile.php?c='+$candleRange
-                  }else{
-                        location.href = 'go.php?c='+$candleRange
-                  }
-
-                }
-
-              });
               $('.current_price').text($currentCoinPrice);
               $.getJSON('https://coincap.io/exchange_rates').done(function(responseRates){
                   $rates = responseRates.rates;
@@ -1069,16 +963,15 @@ $dateTo = date('m/d/Y');
                       $curCoinPrice = $currentCoinPrice * $rates[$cur];
                       $('#current_price').val($curCoinPrice);
                       if($filter == 'XRP' || $filter == 'ETC' ){
-                        $('.current_price').text(toFixedNew($curCoinPrice, 6));
+                        $('.current_price').text(toFixedNew($curCoinPrice, 8));
                       }else{
                         $('.current_price').text(toFixedNew($curCoinPrice, 2));
                       }
 
                   }else{
-                    if($filter == 'ETC'){
+                    if($filter == 'ETC' || $filter == 'EDO' || $filter == 'SAN'  || $filter == 'BCH' || $filter == 'IOT' || $filter == 'DASH' || $filter == 'LTC' || $filter == 'ETP' || $filter == 'NEO' || $filter == 'EOS'  || $filter == 'OMG'  || $filter == 'XMR'){
                       $curCoinPrice = $currentCoinPrice / $currentBtcPrice;
-                      console.log($cur + 'XX: '+ $rates[$cur])
-                      $('.current_price').text(toFixedNew($curCoinPrice, 6));
+                      $('.current_price').text(toFixedNew($curCoinPrice, 8));
                     }
                   }
                   $tickHistory = rspdata.dataFiltered
@@ -1135,16 +1028,16 @@ $dateTo = date('m/d/Y');
                       $data_trade.push(
                           {
                               "date" : $tickDate,
-                              "open" : toFixedNew($open, 6),
-                              "high" :  toFixedNew($high, 6),
-                              "low"  :  toFixedNew($low, 6),
-                              "close" :  toFixedNew($close, 6)
+                              "open" : toFixedNew($open, 8),
+                              "high" :  toFixedNew($high, 8),
+                              "low"  :  toFixedNew($low, 8),
+                              "close" :  toFixedNew($close, 8)
                           }
 
                       );
 
                       if($tickHistory.length-1 == $x){
-                        $group = [parseFloat(toFixedNew($open, 6)),parseFloat(toFixedNew($high, 6)),parseFloat(toFixedNew($low, 6)),parseFloat(toFixedNew($close, 6))];
+                        $group = [parseFloat(toFixedNew($open, 8)),parseFloat(toFixedNew($high, 8)),parseFloat(toFixedNew($low, 8)),parseFloat(toFixedNew($close, 8))];
                       }
                   }
 
@@ -1160,16 +1053,16 @@ $dateTo = date('m/d/Y');
                     $tickValue = ($cur == 'BTC' ? $currentCoinPrice / $currentBtcPrice : $currentCoinPrice * $rates[$cur]);
 
                   }
-                  if($filter == 'XRP' || $filter == 'ETC' || $filter == 'LTC'){
-                    $tickValue = toFixedNew($tickValue, 6);
+                  if($filter == 'XRP' || $filter == 'ETC' || $filter == 'LTC' || $filter == 'EDO' || $filter == 'SAN' || $filter == 'BCH' || $filter == 'IOT' || $filter == 'DASH' || $filter == 'LTC' || $filter == 'ETP' || $filter == 'NEO' || $filter == 'EOS' || $filter == 'OMG'  || $filter == 'XMR'){
+                    $tickValue = toFixedNew($tickValue, 8);
               //      console.log($tickValue);
                   }else{
                     $tickValue = toFixedNew($tickValue, 4);
                   }
-                  $chart = AmCharts.makeChart( "chartdiv", {
+                  var config = {
                       "hideCredits":true,
                       "type": "serial",
-                      "theme": "light",
+                      "theme": "<?=$template?>",
                       //"dataDateFormat":"YYYY-MM-DD JJ:NN:SS",
                       "dataProvider": $data_trade,
                       "valueAxes": [ {
@@ -1180,10 +1073,10 @@ $dateTo = date('m/d/Y');
                               "position": "right",
                               "dashLength": 0,
                               "axisThickness": 1,
-                              "fillColor": "#000",
+                              "fillColor": "<?=$fillColor?>",
                               "axisAlpha": 1,
                               "fillAlpha": 1,
-                              "color": "#fff",
+                              "color": "<?=$textFill?>",
                               "fontSize": 16,
                               "backgroundColor": "#008D00",
                               "id": "live-guide"
@@ -1202,7 +1095,7 @@ $dateTo = date('m/d/Y');
                           "lineColor": "#3daf43",
                           "lineAlpha": 1,
                           "lowField": "low",
-                          "fillAlphas": .9,
+                          "fillAlphas": 1,
                           "negativeFillColors": "#db4c3c",
                           "negativeLineColor": "#db4c3c",
                           "openField": "open",
@@ -1241,7 +1134,8 @@ $dateTo = date('m/d/Y');
                       "export": {
                           "enabled": true
                       }
-                  } );
+                  }
+                  $chart = AmCharts.makeChart( "chartdiv", config );
 
                   $chart.addListener( "rendered", zoomChart );
                   //$chart.graphsSet.toBack();
@@ -1273,8 +1167,8 @@ $dateTo = date('m/d/Y');
 
                               $chart.valueAxes[0].guides.push(
                                   {
-                                      "value": toFixedNew($amount, 2),
-                                      "label": toFixedNew($amount, 2),
+                                      "value": toFixedNew($amount, 8),
+                                      "label": "Entry Price \n"+toFixedNew($amount, 8),
                                       "position": "right",
                                       "dashLength": 0,
                                       "axisThickness": 0.1,
@@ -1297,7 +1191,7 @@ $dateTo = date('m/d/Y');
 
                               zoomChart($startIndex, $endIndex);
 
-                              $trade = '<tr class="trade-index-'+$tradeIndex+'" data-type="'+$typeText.toLowerCase()+'" data-index="'+$tradeIndex+'"><td class="'+$tradeText+'">'+$typeText+'</td><td>'+$amount+'</td><td>'+data[i].pair+'</td><td><span class="timer active-timer"></span></td><td></td><td><button class="btn btn-xs '+$tradeClass+' trade-status">LIVE</button></td><td><span class="trade-investment">'+data[i].leverage+'</span></td><td><span class="trade-payout">'+data[i].payout+'</span></td></tr>';
+                              $trade = '<tr class="trade-index-'+$tradeIndex+'" data-type="'+$typeText.toLowerCase()+'" data-index="'+$tradeIndex+'"><td class="'+$tradeText+'">'+$typeText+'</td><td class="td-text">'+toFixedNew($amount, 8)+'</td><td class="td-text">'+data[i].pair+'</td><td><span class="timer active-timer td-text"></span></td><td class="td-text"></td><td><button class="btn btn-xs '+$tradeClass+' trade-status">LIVE</button></td><td><span class="trade-investment td-text">'+data[i].leverage+'</span></td><td><span class="trade-payout">'+data[i].payout+'</span></td></tr>';
                               $('.trade-log').prepend($trade);
                               $tradeTransaction.push(
                                   {
@@ -1311,13 +1205,13 @@ $dateTo = date('m/d/Y');
                                       status: 'live',
                                       tradeId: data[i].id,
                                       pair: data[i].pair,
-                                      remainder: 5
+                                      remainder: 10
                                   }
                               );
                               $tradeIndex++;
                           }
 
-
+                          getUserById($userId);
                       },
                       data: {param: JSON.stringify({userId: $userId})}
                   });
@@ -1340,7 +1234,41 @@ $dateTo = date('m/d/Y');
                    }
 
 
+                  // switchery
+                  btnSwitch.onchange = function() {
+                    $chart.clear();
+                    if(btnSwitch.checked == true){
+                      $scheme = 'light';
+                    }else{
+                      $scheme = 'black';
+                    }
 
+                    $urlParam = <?php echo json_encode($urlParam); ?>;
+                    if(typeof $urlParam.coin != 'undefined'){
+                      $urlCoin = '&coin='+$urlParam.coin;
+                    }else{
+                      $urlCoin ='';
+                    }
+                    if(typeof $urlParam.currency != 'undefined'){
+                      $urlCurrency = '&currency='+$urlParam.currency;
+                    }else{
+                      $urlCurrency ='';
+                    }
+                    if(typeof $urlParam.template != 'undefined'){
+                      $urlTemplate = '&template='+$urlParam.template;
+                    }else{
+                      $urlTemplate ='';
+                    }
+
+                    if(typeof $urlParam.c != 'undefined'){
+                      $urlC = '&c='+$urlParam.c;
+                    }else{
+                      $urlC ='';
+                    }
+
+
+                    location.href = "go2.php?template="+$scheme+$urlC+$urlCoin+$urlCurrency;
+                  }
 
 
                   console.log('Cur: ' + $cur);
@@ -1348,24 +1276,18 @@ $dateTo = date('m/d/Y');
                   console.log('Pair: ' + $currencyPair);
                   var sock = 0;
                   $coin = $filter;
+                  $price = 0;
                   setInterval(function(){
                     $.getJSON( "coin_live_price/"+$filter+".json", function( json ) {
+                      $updated = true;
                       $price = json.dollarPrice;
+
+                      $btcPrice = $price / $currentBtcPrice;
+                      $btcPriceConv = json.btcPrice;
                       $currentDate = json.timestamp;
                       $currentMatchDate = json.matchDate;
                       if($coin == 'BTC'){
                           $currentBtcPrice = $price;
-                          if(elem.checked == true){
-                            $maxQuadPrice = parseFloat(250 / $currentBtcPrice * 10000);
-                            $('.max-quadpips').val(toFixedNew($maxQuadPrice, 2));
-                            $curExcPrice = $('#leverage').val() / 10000;
-                          }else{
-                            $maxQuadPrice = parseFloat(250 / $currentBtcPrice / 10000);
-                            $('.max-quadpips').val(toFixedNew($maxQuadPrice, 2));
-                            $curExcPrice = $('#leverage').val() * 10000;
-                          }
-
-                          $('.current-exchange-price').text(toFixedNew($curExcPrice, 6));
                           $btcUsd = $price;
                           $pairPrices.BTCUSD = $price;
                           $pairPrices.BTCCNY = $btcUsd * $rates['CNY'];
@@ -1387,15 +1309,39 @@ $dateTo = date('m/d/Y');
                           $pairPrices.LTCCNY = $price * $rates['CNY'];
                           $pairPrices.LTCEUR = $price * $rates['EUR'];
                           $pairPrices.LTCJPY = $price * $rates['JPY'];
-
-
-
-
+                          $pairPrices.LTCBTC = $price / $currentBtcPrice;
                       }else if($coin == 'XRP'){
-
-                          //$pairPrices.XRPBTC = $price / $currentBtcPrice;
                           $pairPrices.XRPBTC = $price;
-
+                      }else if($coin == 'EDO'){
+                          $pairPrices.EDOUSD = $price;
+                          $pairPrices.EDOBTC = $price / $currentBtcPrice;
+                      }else if($coin == 'ETP'){
+                          $pairPrices.ETPUSD = $price;
+                          $pairPrices.ETPBTC = $price / $currentBtcPrice;
+                      }else if($coin == 'NEO'){
+                          $pairPrices.NEOUSD = $price;
+                          $pairPrices.NEOBTC = $price / $currentBtcPrice;
+                      }else if($coin == 'SAN'){
+                          $pairPrices.SANUSD = $price;
+                          $pairPrices.SANBTC = $price / $currentBtcPrice;
+                      }else if($coin == 'ZEC'){
+                          $pairPrices.ZECUSD = $price;
+                          $pairPrices.ZECBTC = $btcPrice;
+                      }else if($coin == 'DASH'){
+                          $pairPrices.DASHUSD = $price;
+                          $pairPrices.DASHBTC = $price / $currentBtcPrice;
+                      }else if($coin == 'BCH'){
+                          $pairPrices.BCHBTC = $price / $currentBtcPrice;
+                      }else if($coin == 'EOS'){
+                          $pairPrices.EOSBTC = $price / $currentBtcPrice;
+                      }else if($coin == 'IOT'){
+                          $pairPrices.IOTBTC = $price / $currentBtcPrice;
+                      }else if($coin == 'OMG'){
+                          $pairPrices.OMGUSD = $price;
+                      }else if($coin == 'XMR'){
+                          $pairPrices.XMRUSD = $price;
+                      }else if($coin == 'BCH'){
+                          $pairPrices.BCHUSD = $price;
                       }
 
 
@@ -1403,16 +1349,16 @@ $dateTo = date('m/d/Y');
                           if($filter =='XRP'){
                               $dPrice = $price;
                           }else{
-                              $dPrice = ($cur == 'BTC' ? $price / $currentBtcPrice : $price * $rates[$cur]);
+                              $dPrice = ($cur == 'BTC' ? $btcPrice : $price * $rates[$cur]);
                           }
 
                       //    console.log($dPrice);
-                          if($filter == 'XRP' || $filter == 'ETC' || $filter == 'ETH'){
-                            $('#current_price').val(toFixedNew($dPrice, 6));
-                            $('.current_price').text(toFixedNew($dPrice, 6));
+                          if($filter == 'XRP' || $filter == 'ETC' || $filter == 'ETH' || $filter == 'EDO' || $filter == 'SAN'  || $filter == 'BCH' || $filter == 'IOT' || $filter == 'DASH' || $filter == 'LTC' || $filter == 'ETP' || $filter == 'NEO' || $filter == 'EOS'  || $filter == 'OMG'  || $filter == 'XMR'){
+                            $('#current_price').val(toFixedNew($dPrice, 8));
+                            $('.current_price').text(toFixedNew($dPrice, 8));
                           }else{
-                            $('#current_price').val(toFixedNew($dPrice, 6));
-                            $('.current_price').text(toFixedNew($dPrice, 6));
+                            $('#current_price').val(toFixedNew($dPrice, 8));
+                            $('.current_price').text(toFixedNew($dPrice, 8));
                           }
 
                           if($price > $beforePrice){
@@ -1445,18 +1391,22 @@ $dateTo = date('m/d/Y');
                                   $ohlcData = computeOHLC($group);
 
                                   if($cur == 'BTC'){
+
                                       if($currencyPair == 'BTC'){
+
                                           $open = parseFloat($ohlcData[0]);
                                           $high = parseFloat($ohlcData[1]);
                                           $low = parseFloat($ohlcData[2]);
                                           $close = parseFloat($ohlcData[3]);
                                       }else{
-                                          if($filter == 'ETH' || $filter == 'ETC'){
+                                          if($filter == 'ETH' || $filter == 'EDO' || $filter == 'ETC' || $filter == 'SAN' || $filter == 'BCH' || $filter == 'IOT' || $filter == 'DASH' || $filter == 'LTC' || $filter == 'ETP' || $filter == 'NEO' || $filter == 'EOS'  || $filter == 'OMG'  || $filter == 'XMR'){
+
                                             $open = parseFloat($ohlcData[0]);
                                             $high = parseFloat($ohlcData[1]);
                                             $low = parseFloat($ohlcData[2]);
                                             $close = parseFloat($ohlcData[3]);
                                           }else{
+
                                             $open = parseFloat($ohlcData[0] / $currentBtcPrice);
                                             $high = parseFloat($ohlcData[1] / $currentBtcPrice);
                                             $low = parseFloat($ohlcData[2] / $currentBtcPrice);
@@ -1490,10 +1440,10 @@ $dateTo = date('m/d/Y');
 
                                   $chart.dataProvider[$curentDataLength - 1] = {
                                       "date" : $lastDate,
-                                      "open" : toFixedNew($open, 6),
-                                      "high" :  toFixedNew($high, 6),
-                                      "low"  :  toFixedNew($low, 6),
-                                      "close" :  toFixedNew($close, 6)
+                                      "open" : toFixedNew($open, 8),
+                                      "high" :  toFixedNew($high, 8),
+                                      "low"  :  toFixedNew($low, 8),
+                                      "close" :  toFixedNew($close, 8)
                                   }
                               }else{
 
@@ -1503,18 +1453,22 @@ $dateTo = date('m/d/Y');
                                   $ohlcData = computeOHLC($group);
 
                                   if($cur == 'BTC'){
+
                                       if($currencyPair == 'BTC'){
+
                                         $open = parseFloat($ohlcData[0]);
                                         $high = parseFloat($ohlcData[1]);
                                         $low = parseFloat($ohlcData[2]);
                                         $close = parseFloat($ohlcData[3]);
                                       }else{
-                                        if($filter == 'ETH' || $filter == 'ETC'){
+                                        if($filter == 'ETH' || $filter == 'EDO' || $filter == 'ETC' || $filter == 'SAN' || $filter == 'BCH' || $filter == 'IOT' || $filter == 'DASH' || $filter == 'LTC' || $filter == 'ETP' || $filter == 'NEO' ||  $filter == 'EOS'  || $filter == 'OMG'  || $filter == 'XMR'){
+
                                           $open = parseFloat($ohlcData[0]);
                                           $high = parseFloat($ohlcData[1]);
                                           $low = parseFloat($ohlcData[2]);
                                           $close = parseFloat($ohlcData[3]);
                                         }else{
+
                                           $open = parseFloat($ohlcData[0] / $currentBtcPrice);
                                           $high = parseFloat($ohlcData[1] / $currentBtcPrice);
                                           $low = parseFloat($ohlcData[2] / $currentBtcPrice);
@@ -1548,10 +1502,10 @@ $dateTo = date('m/d/Y');
                                   $chart.dataProvider.shift(); // removes first index
                                   $chart.dataProvider.push( {
                                       "date" : $currentDate,
-                                      "open" : toFixedNew($open, 6),
-                                      "high" :  toFixedNew($high, 6),
-                                      "low"  :  toFixedNew($low, 6),
-                                      "close" :  toFixedNew($close, 6)
+                                      "open" : toFixedNew($open, 8),
+                                      "high" :  toFixedNew($high, 8),
+                                      "low"  :  toFixedNew($low, 8),
+                                      "close" :  toFixedNew($close, 8)
                                   } );
 
 
@@ -1572,13 +1526,15 @@ $dateTo = date('m/d/Y');
                                           $high = parseFloat($ohlcData[1]);
                                           $low = parseFloat($ohlcData[2]);
                                           $close = parseFloat($ohlcData[3]);
+                                          console.log('B');
                                       }else{
-                                          if($filter == 'ETH' || $filter == 'ETC'){
+                                          if($filter == 'ETH' || $filter == 'EDO' || $filter == 'ETC' || $filter == 'SAN' || $filter == 'BCH' || $filter == 'IOT' || $filter == 'DASH' || $filter == 'LTC' || $filter == 'ETP' || $filter == 'NEO' ||  $filter == 'EOS'  || $filter == 'OMG'  || $filter == 'XMR'){
                                             $open = parseFloat($ohlcData[0]);
                                             $high = parseFloat($ohlcData[1]);
                                             $low = parseFloat($ohlcData[2]);
                                             $close = parseFloat($ohlcData[3]);
                                           }else{
+                                            console.log('A');
                                             $open = parseFloat($ohlcData[0] / $currentBtcPrice);
                                             $high = parseFloat($ohlcData[1] / $currentBtcPrice);
                                             $low = parseFloat($ohlcData[2] / $currentBtcPrice);
@@ -1612,10 +1568,10 @@ $dateTo = date('m/d/Y');
 
                                   $chart.dataProvider[$curentDataLength - 1] = {
                                       "date" : $lastDate,
-                                      "open" : toFixedNew($open, 6),
-                                      "high" :  toFixedNew($high, 6),
-                                      "low"  :  toFixedNew($low, 6),
-                                      "close" :  toFixedNew($close, 6)
+                                      "open" : toFixedNew($open, 8),
+                                      "high" :  toFixedNew($high, 8),
+                                      "low"  :  toFixedNew($low, 8),
+                                      "close" :  toFixedNew($close, 8)
                                   }
                               }else{
 
@@ -1626,17 +1582,20 @@ $dateTo = date('m/d/Y');
 
                                   if($cur == 'BTC'){
                                       if($currencyPair == 'BTC'){
+
                                         $open = parseFloat($ohlcData[0]);
                                         $high = parseFloat($ohlcData[1]);
                                         $low = parseFloat($ohlcData[2]);
                                         $close = parseFloat($ohlcData[3]);
                                       }else{
-                                        if($filter == 'ETH' || $filter == 'ETC'){
+                                        if($filter == 'ETH' || $filter == 'EDO' || $filter == 'ETC' || $filter == 'SAN' || $filter == 'BCH' || $filter == 'IOT' || $filter == 'DASH' || $filter == 'LTC' || $filter == 'ETP' || $filter == 'NEO' ||  $filter == 'EOS'  || $filter == 'OMG'  || $filter == 'XMR'){
+
                                           $open = parseFloat($ohlcData[0]);
                                           $high = parseFloat($ohlcData[1]);
                                           $low = parseFloat($ohlcData[2]);
                                           $close = parseFloat($ohlcData[3]);
                                         }else{
+
                                           $open = parseFloat($ohlcData[0] / $currentBtcPrice);
                                           $high = parseFloat($ohlcData[1] / $currentBtcPrice);
                                           $low = parseFloat($ohlcData[2] / $currentBtcPrice);
@@ -1672,23 +1631,20 @@ $dateTo = date('m/d/Y');
                                   $chart.dataProvider.shift(); // removes first index
                                   $chart.dataProvider.push( {
                                       "date" : $currentDate,
-                                      "open" : toFixedNew($open, 6),
-                                      "high" :  toFixedNew($high, 6),
-                                      "low"  :  toFixedNew($low, 6),
-                                      "close" :  toFixedNew($close, 6)
+                                      "open" : toFixedNew($open, 8),
+                                      "high" :  toFixedNew($high, 8),
+                                      "low"  :  toFixedNew($low, 8),
+                                      "close" :  toFixedNew($close, 8)
                                   } );
 
 
 
                               }
                             }
-
-
-
-                            if($filter == 'XRP' || $filter == 'ETC' || $filter == 'ETH' || $filter == 'LTC'){
-                              $lPrice = toFixedNew($dPrice, 6);
-                              $chart.valueAxes[0].guides[0].label = toFixedNew($dPrice, 6);
-                              $chart.valueAxes[0].guides[0].value = toFixedNew($dPrice, 6);
+                            if($filter == 'XRP' || $filter == 'ETC' || $filter == 'ETH' || $filter == 'LTC' || $filter == 'EDO' || $filter == 'SAN' || $filter == 'BCH' || $filter == 'IOT' || $filter == 'DASH' || $filter == 'LTC' || $filter == 'ETP' || $filter == 'NEO' ||  $filter == 'EOS' || $filter == 'OMG' || $filter == 'XMR'){
+                              $lPrice = toFixedNew($dPrice, 8);
+                              $chart.valueAxes[0].guides[0].label = toFixedNew($dPrice, 8);
+                              $chart.valueAxes[0].guides[0].value = toFixedNew($dPrice, 8);
                             //  console.log('P: ' + toFixedNew($dPrice, 6));
 
                             }else{
@@ -1713,15 +1669,12 @@ $dateTo = date('m/d/Y');
                               $tIndex = $tradeTransaction[$h].index;
 
                               $tStatus = $tradeTransaction[$h].status;
-                              if(elem.checked == true){
-                                $tPayout = $tradeTransaction[$h].payout;
-                              }else{
-                                $tPayout = $tradeTransaction[$h].payout / 10000;
-                              }
+                              $tPayout = $tradeTransaction[$h].payout;
+
                               if($tStatus == 'live'){
                                 if($tType == 'buy'){
                                   if($landingAmount <= $lPrice){
-                                    $('.trade-index-'+$tIndex).find('.trade-payout').removeClass('text-danger').addClass('text-success').text($tPayout.toPrecise(6));
+                                    $('.trade-index-'+$tIndex).find('.trade-payout').removeClass('text-danger').addClass('text-success').text($tPayout);
                                   }else if($landingAmount == $lPrice){
                                     $('.trade-index-'+$tIndex).find('.trade-payout').removeClass('text-danger').removeClass('text-success').text(0);
                                   }else{
@@ -1729,7 +1682,7 @@ $dateTo = date('m/d/Y');
                                   }
                                 }else{
                                   if($landingAmount >= $lPrice){
-                                    $('.trade-index-'+$tIndex).find('.trade-payout').removeClass('text-danger').addClass('text-success').text($tPayout.toPrecise(6));
+                                    $('.trade-index-'+$tIndex).find('.trade-payout').removeClass('text-danger').addClass('text-success').text($tPayout);
                                   }else if($landingAmount == $lPrice){
                                     $('.trade-index-'+$tIndex).find('.trade-payout').removeClass('text-danger').removeClass('text-success').text(0);
                                   }else{
@@ -1740,6 +1693,7 @@ $dateTo = date('m/d/Y');
                             }
                     });
                   }, 1000);
+
 
                   function computeOHLC(values){
                       $low = Math.min.apply(Math, values);
@@ -1760,204 +1714,304 @@ $dateTo = date('m/d/Y');
               $arrowTick = [];
 
               $tradeTransaction = [];
-              $('#buy').click(function(){
+              $('#buy').unbind().click(function(){
+
+                // check atu;
+
+                $buyButton = $(this);
+                $buyButton.attr('disabled', true);
+                if(_efx8 == true){
                   $funds = parseFloat($('.userFunds').text());
                   if($funds > 0){
-                    $amount = parseFloat($('#current_price').val());
-                    if(elem.checked == true){
-                      $leverage = parseFloat($('#leverage').val());
-                      $payout = ($leverage * .70) + $leverage;
-                      $leverageDisplay = parseFloat($('#leverage').val());
-                      $payoutDisplay = ($leverage * .70) + $leverage;
-                      $winAmount = $leverage * .70;
+                    if($funds < 10){
+                      $('.no-funds-text').html('Error: Balance is below required margin amount');
+                      $('#depositModal').modal('show');
                     }else{
-                      $leverage = parseFloat($('#leverage').val()) * 10000;
-                      $payout = ($leverage * .70) + $leverage;
-                      $leverageDisplay = parseFloat($('#leverage').val());
-                      $payoutDisplay = ($leverageDisplay * .70) + $leverageDisplay;
-                      $winAmount = $leverageDisplay * .70;
+                      $leverage = parseFloat($('#leverage').val());
+                      totalTradeAmount += $leverage;
+                      if(totalTradeAmount > $maxTradeAmount){
+                        alert('Maximum Trade Limit Exceeded. Reduce Trade Amount Size.')
+                        totalTradeAmount -= $leverage;
+                      }else{
+                        if(($funds - totalTradeAmount) < 0){
+                          $('.no-funds-text').html('Error: Balance is below required margin amount');
+                          $('#depositModal').modal('show');
+                          totalTradeAmount -= $leverage;
+                        }else{
+                          $newBal = $funds - $leverage;
+                          $('.userFunds').text(toFixedNew($newBal, 2));
+                          $amount = parseFloat($('#current_price').val());
+
+                          $chargePercent = $leverage - ($leverage * .70);
+                          $chargePercent = $leverage - $chargePercent;
+
+
+                          if($chargePercent >= $tradePercentageAmount){
+                            $leverageCut = .85;
+                            $percentCut = 15;
+                          }else{
+                            $leverageCut = .70;
+                            $percentCut = 30;
+                          }
+                          $percentCutAmount = $leverage - ($leverage * $leverageCut);
+                          $payout = ($leverage * $leverageCut) + $leverage;
+                          $leverageDisplay = parseFloat($('#leverage').val());
+                          $payoutDisplay = ($leverage * $leverageCut) + $leverage;
+                          $winAmount = $leverage * $leverageCut;
+
+
+
+
+                          $chart.valueAxes[0].guides.push(
+                              {
+                                  "value": toFixedNew($amount, 8),
+                                  "label": "Entry Price \n"+ toFixedNew($amount, 8),
+                                  "position": "right",
+                                  "dashLength": 0,
+                                  "axisThickness": 0.1,
+                                  "fillColor": "#008D00",
+                                  "axisAlpha": 1,
+                                  "fillAlpha": 1,
+                                  "color": "#fff",
+                                  "fontSize": 16,
+                                  "backgroundColor": "#008D00",
+                                  "id": "live-guide-buy-"+($tradeIndex+1)
+                              }
+                          );
+                          $startIndex = $chart.startIndex;
+                          $endIndex = $chart.endIndex - $chart.dataProvider.length;
+                          $chart.validateData();
+                          zoomChart($startIndex, $endIndex);
+
+
+                          $('.amcharts-chart-div a').css('display', 'none');
+                          //validate();
+                          //insert_order('buy');
+                          $trade = '<tr class="trade-index-'+$tradeIndex+'" data-type="buy" data-index="'+$tradeIndex+'"><td class="text-success">Buy</td><td class="td-text">'+$amount+'</td><td class="td-text">'+$cryptoCoin+$cur+'</td><td class="td-text"><span class="timer active-timer"></span></td><td class="exit-price td-text"></td><td><button class="btn btn-xs btn-success trade-status">LIVE</button></td><td><span class="trade-investment td-text">'+$leverageDisplay+'</span></td><td><span class="trade-payout">'+$payoutDisplay+'</span></td></tr>';
+                          $('.trade-log').prepend($trade);
+
+                          $logTradeData = {
+                              expires: parseInt($('.selected-expire').attr('data-value')),
+                              type: 'buy',
+                              status: 'live',
+                              amount: $amount,
+                              leverage: $leverage,
+                              payout: $payout,
+                              leverageDisplay: $leverageDisplay,
+                              payoutDisplay: $payoutDisplay,
+                              winAmount: $winAmount,
+                              ticker: $filter,
+                              userId: $userId,
+                              pair: $cryptoCoin+$cur,
+                              remainder: 10,
+                              percentCut: $percentCut,
+                              percentCutAmount: $percentCutAmount,
+                              balanceId: $balanceId
+                          };
+                          console.log('W');
+                          console.log($logTradeData);
+                          $tIndex = 'track_'+($tradeIndex+1);
+                          $tracks[$tIndex] = ['amcharts-guide-live-guide-buy-'+($tradeIndex+1), '#008D00'];
+
+                          addRect($tracks);
+                          localStorage.setItem("tracks", JSON.stringify($tracks));
+                          $.ajax({
+                              url: 'Controller/user.php?action=register-trade',
+                              type: 'post',
+                              dataType: 'json',
+                              success: function (data) {
+                                  atuP = $amount;
+                                  checkATU($userId, $amount, 'buy',$cryptoCoin, data.tradeId);
+                                  atuAction = 'buy';
+                                  $tradeTransaction.push(
+                                      {
+                                          index: $tradeIndex,
+                                          time: parseInt($('.selected-expire').attr('data-value')),
+                                          amount: data.data.amount,
+                                          leverage: data.data.leverageDisplay,
+                                          payout: data.data.payoutDisplay,
+                                          leverageDisplay: data.data.leverageDisplay,
+                                          payoutDisplay: data.data.payoutDisplay,
+                                          winAmount: data.data.winAmount,
+                                          type: 'buy',
+                                          status: 'live',
+                                          tradeId: data.tradeId,
+                                          pair: $coin+$cur,
+                                          remainder: 10
+                                      }
+                                  );
+
+                                  console.log('R');
+                                  console.log($tradeTransaction);
+
+                                  $balanceId = data.balanceStatus.id;
+                                  $tradePercentageAmount = data.balanceStatus.trade_percentage_amount;
+
+                                  $tradeIndex++;
+                              },
+                              data: {param: JSON.stringify($logTradeData)}
+                          });
+
+                          //countDownTimer(0, 'buy');
+                        }
+                      }
                     }
 
+                    }else{
+                      // $('.no-funds-text').html('Error: Maximum Funds Margin Limit Exceeded');
+                      $('.no-funds-text').html('Error: Margin not available');
+                      $('#depositModal').modal('show');
+                    }
+                }else{
+                  $('#disclaimerModal').modal('show');
+                }
 
-
-                    $chart.valueAxes[0].guides.push(
-                        {
-                            "value": toFixedNew($amount, 6),
-                            "label": toFixedNew($amount, 6),
-                            "position": "right",
-                            "dashLength": 0,
-                            "axisThickness": 0.1,
-                            "fillColor": "#008D00",
-                            "axisAlpha": 1,
-                            "fillAlpha": 1,
-                            "color": "#fff",
-                            "fontSize": 16,
-                            "backgroundColor": "#008D00",
-                            "id": "live-guide-buy-"+($tradeIndex+1)
-                        }
-                    );
-                    $startIndex = $chart.startIndex;
-                    $endIndex = $chart.endIndex - $chart.dataProvider.length;
-                    $chart.validateData();
-                    zoomChart($startIndex, $endIndex);
-
-
-                    $('.amcharts-chart-div a').css('display', 'none');
-                    //validate();
-                    //insert_order('buy');
-                    $trade = '<tr class="trade-index-'+$tradeIndex+'" data-type="buy" data-index="'+$tradeIndex+'"><td class="text-success">Buy</td><td>'+$amount+'</td><td>'+$cryptoCoin+$cur+'</td><td><span class="timer active-timer"></span></td><td class="exit-price"></td><td><button class="btn btn-xs btn-success trade-status">LIVE</button></td><td><span class="trade-investment">'+$leverageDisplay+'</span></td><td><span class="trade-payout">'+$payoutDisplay+'</span></td></tr>';
-                    $('.trade-log').prepend($trade);
-
-                    $logTradeData = {
-                        expires: parseInt($('.selected-expire').attr('data-value')),
-                        type: 'buy',
-                        status: 'live',
-                        amount: $amount,
-                        leverage: $leverage,
-                        payout: $payout,
-                        leverageDisplay: $leverageDisplay,
-                        payoutDisplay: $payoutDisplay,
-                        winAmount: $winAmount,
-                        ticker: $filter,
-                        userId: $userId,
-                        pair: $cryptoCoin+$cur,
-                        remainder: 5
-                    };
-                    $tIndex = 'track_'+($tradeIndex+1);
-                    $tracks[$tIndex] = ['amcharts-guide-live-guide-buy-'+($tradeIndex+1), '#008D00'];
-
-                    addRect($tracks);
-                    localStorage.setItem("tracks", JSON.stringify($tracks));
-                    $.ajax({
-                        url: 'Controller/user.php?action=register-trade',
-                        type: 'post',
-                        dataType: 'json',
-                        success: function (data) {
-                            $tradeTransaction.push(
-                                {
-                                    index: $tradeIndex,
-                                    time: parseInt($('.selected-expire').attr('data-value')),
-                                    amount: $amount,
-                                    leverage: $leverage,
-                                    payout: $payout,
-                                    leverageDisplay: $leverageDisplay,
-                                    payoutDisplay: $payoutDisplay,
-                                    winAmount: $winAmount,
-                                    type: 'buy',
-                                    status: 'live',
-                                    tradeId: data.tradeId,
-                                    pair: $coin+$cur,
-                                    remainder: 5
-                                }
-                            );
-                            $tradeIndex++;
-                        },
-                        data: {param: JSON.stringify($logTradeData)}
-                    });
-
-                    //countDownTimer(0, 'buy');
-                  }else{
-                    $('#depositModal').modal('show');
-                  }
-
+                setTimeout(function(){
+                  $buyButton.removeAttr('disabled');
+                }, 300);
               });
 
-              $('#sell').click(function(){
+
+              $('#sell').unbind().click(function(){
+                  $sellButton = $(this);
+                  $sellButton.attr('disabled', true);
                   $funds =  parseFloat($('.userFunds').text());
-                  if($funds > 0){
-                    $amount = parseFloat($('#current_price').val());
-                    $chart.valueAxes[0].guides.push(
-                        {
-                          "value": toFixedNew($amount, 6),
-                          "label": toFixedNew($amount, 6),
-                            "position": "right",
-                            "dashLength": 0,
-                            "axisThickness": 0.1,
-                            "fillColor": "#DB333C",
-                            "axisAlpha": 1,
-                            "fillAlpha": 1,
-                            "color": "#fff",
-                            "fontSize": 16,
-                            "backgroundColor": "#DB333C",
-                            "id": "live-guide-sell-"+($tradeIndex+1)
-
-                        }
-                    );
-                    $startIndex = $chart.startIndex;
-                    $endIndex = $chart.endIndex - $chart.dataProvider.length;
-                    $chart.validateData();
-                    zoomChart($startIndex, $endIndex);
 
 
-                    $('.amcharts-chart-div a').css('display', 'none');
+                  if(_efx8 == true){
+                    if($funds > 0){
+                      if($funds < 10){
+                        $('.no-funds-text').html('Error: Balance is below required margin amount');
+                        $('#depositModal').modal('show');
+                      }else{
+                        $leverage = parseFloat($('#leverage').val());
+                        totalTradeAmount += $leverage;
+                        if(totalTradeAmount > $maxTradeAmount){
+                          alert('Maximum Trade Limit Exceeded. Reduce Trade Amount Size.')
+                          totalTradeAmount -= $leverage;
+                        }else{
+                          if(($funds - totalTradeAmount) < 0){
+                            $('.no-funds-text').html('Error: Balance is below required margin amount');
+                            $('#depositModal').modal('show');
+                            totalTradeAmount -= $leverage;
+                          }else{
+                            $newBal = $funds - $leverage;
+                            $('.userFunds').text(toFixedNew($newBal, 2));
+                            $amount = parseFloat($('#current_price').val());
 
-                    if(elem.checked == true){
-                      $leverage = parseFloat($('#leverage').val());
-                      $payout = ($leverage * .70) + $leverage;
-                      $leverageDisplay = parseFloat($('#leverage').val());
-                      $payoutDisplay = ($leverage * .70) + $leverage;
-                      $winAmount = $leverage * .70;
-                    }else{
-                      $leverage = parseFloat($('#leverage').val()) * 10000;
-                      $payout = ($leverage * .70) + $leverage;
-                      $leverageDisplay = parseFloat($('#leverage').val());
-                      $payoutDisplay = ($leverageDisplay * .70) + $leverageDisplay;
-                      $winAmount = $leverageDisplay * .70;
-                    }
-
-                    $trade = '<tr class="trade-index-'+$tradeIndex+'" data-type="sell" data-index="'+$tradeIndex+'"><td class="text-danger">Sell</td><td>'+$amount+'</td><td>'+$cryptoCoin+$cur+'</td><td><span class="timer active-timer"></span></td><td class="exit-price"></td><td><button class="btn btn-xs btn-success trade-status">LIVE</button></td><td><span class="trade-investment">'+$leverageDisplay+'</span></td><td><span class="trade-payout">'+$payoutDisplay+'</span></td></tr>';
-                    $('.trade-log').prepend($trade);
-                    $logTradeData = {
-                        expires: parseInt($('.selected-expire').attr('data-value')),
-                        type: 'sell',
-                        status: 'live',
-                        amount: $amount,
-                        leverage: $leverage,
-                        payout: $payout,
-                        leverageDisplay: $leverageDisplay,
-                        payoutDisplay: $payoutDisplay,
-                        winAmount: $winAmount,
-                        ticker: $filter,
-                        userId: $userId,
-                        pair: $cryptoCoin+$cur,
-                        remainder: 5
-                    };
-
-                    $tIndex = 'track_'+($tradeIndex+1);
-                    $tracks[$tIndex] = ['amcharts-guide-live-guide-sell-'+($tradeIndex+1), '#DB333C'];
-                    addRect($tracks);
-                    localStorage.setItem("tracks", JSON.stringify($tracks));
-                    $.ajax({
-                        url: 'Controller/user.php?action=register-trade',
-                        type: 'post',
-                        dataType: 'json',
-                        success: function (data) {
-                            $tradeTransaction.push(
+                            $chart.valueAxes[0].guides.push(
                                 {
-                                    index: $tradeIndex,
-                                    time: parseInt($('.selected-expire').attr('data-value')),
-                                    amount: $amount,
-                                    leverage: $leverage,
-                                    payout: $payout,
-                                    leverageDisplay: $leverageDisplay,
-                                    payoutDisplay: $payoutDisplay,
-                                    winAmount: $winAmount,
-                                    type: 'sell',
-                                    status: 'live',
-                                    tradeId: data.tradeId,
-                                    remainder: 5
+                                  "value": toFixedNew($amount, 8),
+                                  "label": "Entry Price \n"+toFixedNew($amount, 8),
+                                    "position": "right",
+                                    "dashLength": 0,
+                                    "axisThickness": 0.1,
+                                    "fillColor": "#DB333C",
+                                    "axisAlpha": 1,
+                                    "fillAlpha": 1,
+                                    "color": "#fff",
+                                    "fontSize": 16,
+                                    "backgroundColor": "#DB333C",
+                                    "id": "live-guide-sell-"+($tradeIndex+1)
+
                                 }
                             );
+                            $startIndex = $chart.startIndex;
+                            $endIndex = $chart.endIndex - $chart.dataProvider.length;
+                            $chart.validateData();
+                            zoomChart($startIndex, $endIndex);
 
-                            $tradeIndex++;
-                        },
-                        data: {param: JSON.stringify($logTradeData)}
-                    });
 
+                            $('.amcharts-chart-div a').css('display', 'none');
+
+                            $chargePercent = $leverage - ($leverage * .70);
+                            $chargePercent = $leverage - $chargePercent;
+
+                            if($chargePercent >= $tradePercentageAmount){
+                              $leverageCut = .85;
+                              $percentCut = 15;
+                            }else{
+                              $leverageCut = .70;
+                              $percentCut = 30;
+                            }
+
+                            $percentCutAmount = $leverage - ($leverage * $leverageCut);
+                            $payout = ($leverage * $leverageCut) + $leverage;
+                            $leverageDisplay = parseFloat($('#leverage').val());
+                            $payoutDisplay = ($leverage * $leverageCut) + $leverage;
+                            $winAmount = $leverage * $leverageCut;
+
+                            $trade = '<tr class="trade-index-'+$tradeIndex+'" data-type="sell" data-index="'+$tradeIndex+'"><td class="text-danger">Sell</td><td class="td-text">'+$amount+'</td><td class="td-text">'+$cryptoCoin+$cur+'</td><td><span class="timer active-timer td-text"></span></td><td class="exit-price td-text"></td><td><button class="btn btn-xs btn-success trade-status">LIVE</button></td><td><span class="trade-investment td-text">'+$leverageDisplay+'</span></td><td><span class="trade-payout">'+$payoutDisplay+'</span></td></tr>';
+                            $('.trade-log').prepend($trade);
+                            $logTradeData = {
+                                expires: parseInt($('.selected-expire').attr('data-value')),
+                                type: 'sell',
+                                status: 'live',
+                                amount: $amount,
+                                leverage: $leverageDisplay,
+                                payout: $payoutDisplay,
+                                leverageDisplay: $leverageDisplay,
+                                payoutDisplay: $payoutDisplay,
+                                winAmount: $winAmount,
+                                ticker: $filter,
+                                userId: $userId,
+                                pair: $cryptoCoin+$cur,
+                                remainder: 10,
+                                percentCut: $percentCut,
+                                percentCutAmount: $percentCutAmount,
+                                balanceId: $balanceId
+                            };
+
+                            $tIndex = 'track_'+($tradeIndex+1);
+                            $tracks[$tIndex] = ['amcharts-guide-live-guide-sell-'+($tradeIndex+1), '#DB333C'];
+                            addRect($tracks);
+                            localStorage.setItem("tracks", JSON.stringify($tracks));
+                            $.ajax({
+                                url: 'Controller/user.php?action=register-trade',
+                                type: 'post',
+                                dataType: 'json',
+                                success: function (data) {
+                                  checkATU($userId, $amount, 'sell', $cryptoCoin, data.tradeId);
+                                  atuAction = 'sell';
+                                  atuP = $amount;
+                                    $tradeTransaction.push(
+                                        {
+                                            index: $tradeIndex,
+                                            time: parseInt($('.selected-expire').attr('data-value')),
+                                            amount: data.data.amount,
+                                            leverage: data.data.leverageDisplay,
+                                            payout: data.data.payoutDisplay,
+                                            leverageDisplay: data.data.leverageDisplay,
+                                            payoutDisplay: data.data.payoutDisplay,
+                                            winAmount: data.data.winAmount,
+                                            type: 'sell',
+                                            status: 'live',
+                                            tradeId: data.tradeId,
+                                            remainder: 10
+                                        }
+                                    );
+                                    $balanceId = data.balanceStatus.id;
+                                    $tradePercentageAmount = data.balanceStatus.trade_percentage_amount;
+                                    $tradeIndex++;
+                                },
+                                data: {param: JSON.stringify($logTradeData)}
+                            });
+                          }
+                        }
+
+                      }
+
+                    }else{
+                      $('.no-funds-text').html('Error: No Funds Available');
+                      $('#depositModal').modal('show');
+                    }
                   }else{
-                    $('#depositModal').modal('show');
+                    $('#disclaimerModal').modal('show');
                   }
 
+                  setTimeout(function(){
+                    $sellButton.removeAttr('disabled');
+                  }, 300);
               });
 
               // Timer
@@ -1969,12 +2023,12 @@ $dateTo = date('m/d/Y');
                       $row = $('.trade-index-'+$index);
                       $minute = $tradeTransaction[$a]['time'];
                       $status = $tradeTransaction[$a]['status'];
-                      $leverage = $tradeTransaction[$a]['leverage'];
+                      $leveraget = $tradeTransaction[$a]['leverage'];
                       $winAmount = $tradeTransaction[$a]['winAmount'];
                       $tradeId = $tradeTransaction[$a]['tradeId'];
                       $remainder = parseInt($tradeTransaction[$a]['remainder']);
                       $pairing = $tradeTransaction[$a]['pair'];
-                      $payout = $tradeTransaction[$a]['payout'];
+                      $payoutt = $tradeTransaction[$a]['payout'];
                       if($status == 'live'){
 
                           $type = $tradeTransaction[$a]['type'];
@@ -1988,7 +2042,7 @@ $dateTo = date('m/d/Y');
                                   if($amount > $entryValue){
                                       $row.find('.trade-status').removeClass('btn-default').addClass('btn-success').text('CLOSE');
                                       $tradeStatus = 'win';
-                                      $row.find('.trade-payout').removeClass('text-danger').addClass('text-success').text($payout);
+                                      $row.find('.trade-payout').removeClass('text-danger').addClass('text-success').text($payoutt);
                                       $row.find('.exit-price').text($amount);
 
                                   }else if($amount == $entryValue){
@@ -2008,7 +2062,7 @@ $dateTo = date('m/d/Y');
                               }else{
                                   if($amount < $entryValue){
                                       $row.find('.trade-status').removeClass('btn-default').addClass('btn-success').text('CLOSE');
-                                      $row.find('.trade-payout').removeClass('text-danger').addClass('text-success').text($payout);
+                                      $row.find('.trade-payout').removeClass('text-danger').addClass('text-success').text($payoutt);
                                       $row.find('.exit-price').text($amount);
                                       $tradeStatus = 'win';
                                   }else if($amount == $entryValue){
@@ -2029,11 +2083,16 @@ $dateTo = date('m/d/Y');
                               $tradeData = {
                                   close: $amount,
                                   winAmount: $winAmount,
-                                  leverage: $leverage,
+                                  leverage: $leveraget,
                                   status: $tradeStatus,
                                   tradeId: $tradeId,
                                   userId: $userId
                               }
+
+                              if($tradeStatus == 'win'){
+                                console.log($tradeData);
+                              }
+
 
                               logTrades($tradeData);
                               $row.find('.timer').text('');
@@ -2052,6 +2111,7 @@ $dateTo = date('m/d/Y');
                               $('.amcharts-chart-div a').css('display', 'none');
                               $tradeTransaction[$a]['status'] = 'complete';
 
+                              totalTradeAmount -= $leveraget;
 
                           }
 
@@ -2083,9 +2143,14 @@ $dateTo = date('m/d/Y');
 
                           if($remainder == 0){
                               $('tr.trade-index-'+$index).remove();
+                              if(atuEnabled == true){
+                                atuEnabled == false;
+                                updateATU($userId, $tradeId);
+                              }
                           }
 
                           $tradeTransaction[$a]['remainder'] = $remainder - 1;
+
                       }
 
 
@@ -2103,7 +2168,7 @@ $dateTo = date('m/d/Y');
                       type: 'post',
                       dataType: 'json',
                       success: function (data) {
-                          $('.userFunds').text(data.response.funds);
+                          $('.userFunds').text(toFixedNew(data.response.funds, 2));
                       },
                       data: {param: JSON.stringify($data)}
                   });
@@ -2160,7 +2225,7 @@ $dateTo = date('m/d/Y');
                 $('.table-loader').css('display', 'block');
                 $('#tradeHistoryBody').html('<tr><td colspan="7 text-center">Loading data....</td></tr>');
                 $.ajax({
-                    url: 'Controller/history.php?action=trade-history',
+                    url: 'Controller/history2.php?action=trade-history',
                     type: 'post',
                     dataType: 'json',
                     success: function (data) {
@@ -2169,8 +2234,9 @@ $dateTo = date('m/d/Y');
                       $tableBody = '';
                         console.log(data);
                       if(data.length == 0){
-                        $tableBody += '<tr><td colspan="7 text-center">No data available</td></tr>';
+                        $tableBody += '<tr><td colspan="8" class="text-center">No data available</td></tr>';
                       }else{
+                        $totalPnl = 0;
                         for($z = 0; $z < data.length; $z++){
 
                           $entryPrice = data[$z].entryPrice;
@@ -2182,28 +2248,56 @@ $dateTo = date('m/d/Y');
                           $pnl = data[$z].pnl;
                           $status = data[$z].status;
                           $pair = data[$z].pair;
+                          $cost = data[$z].trade_percentage_amount;
+                          $tradePercentCut = data[$z].trade_percent_cut;
+                          if($tradePercentCut == 15){
+                            $rebateText = "";
+                            $spacer = "";
+                          }else{
+                            $rebateText = "";
+                            $spacer = "";
+                          }
+
                           if($status == 'win'){
                             $textClass = 'text-success';
                             $pnl = '+'+$pnl;
                           }else if($status == 'even'){
                             $textClass = 'text-default';
                             $pnl = 0;
-                          }
-                          else{
+                          }else if($status == 'Deposit' || $status == 'Withdraw'){
+                            $textClass = 'text-default';
+                          }else{
                             $textClass = 'text-danger';
                             $pnl = '-'+$pnl;
                           }
+
+
+                          if($status == 'win' || $status == 'lost'){
+                            $totalPnl += parseFloat($pnl);
+                          }
                           $tableBody += '<tr>'
-                                        +'<td>'+ $entryPrice + '</td>'
-                                        +'<td>'+ $position + '</td>'
-                                        +'<td>'+ $entryTime + '</td>'
-                                        +'<td>'+ $lvrg + '</td>'
-                                        +'<td>'+ $exitPrice + '</td>'
-                                        +'<td>'+ $exitTime + '</td>'
-                                        +'<td>'+ $pair + '</td>'
-                                        +'<td class="'+$textClass+'">'+ $pnl + '</td>'
+                                        +'<td>'+$spacer+ $entryPrice + '</td>'
+                                        +'<td>'+$spacer+ $position + '</td>'
+                                        +'<td>'+$spacer+ $entryTime + '</td>'
+                                        +'<td>'+ $rebateText+$lvrg + '</td>'
+                                        +'<td>'+ $rebateText+$exitPrice + '</td>'
+                                        +'<td>'+$spacer+ $exitTime + '</td>'
+                                        +'<td>'+$spacer+ $pair + '</td>'
+                                        +'<td>'+$spacer+ $cost + '</td>'
+                                        +'<td class="'+$textClass+'">'+$spacer+ $pnl + '</td>'
                                       +'</tr>';
                         }
+
+                        $totalPnlClass = 'text-success';
+                        $totalPnlSymbol = '+';
+                        if($totalPnl < 0){
+                          $totalPnlClass = 'text-danger';
+                          $totalPnlSymbol = '';
+                        }else if($totalPnl == 0){
+                          $totalPnlClass = '';
+                          $totalPnlSymbol = '';
+                        }
+                        $('.totalPnL').html('<span class="'+$totalPnlClass +'">'+$totalPnlSymbol+$totalPnl+'</span>');
 
                       }
 
@@ -2232,7 +2326,7 @@ $dateTo = date('m/d/Y');
           $('.table-loader').css('display', 'block');
           $('.trade-table').css('display', 'none');
           $.ajax({
-              url: 'Controller/history.php?action=trade-history',
+              url: 'Controller/history2.php?action=trade-history',
               type: 'post',
               dataType: 'json',
               success: function (data) {
@@ -2240,9 +2334,11 @@ $dateTo = date('m/d/Y');
                 $('.trade-table').css('display', 'table');
                 $tableBody = '';
                   console.log(data);
+                  $totalPnl = 0;
                 if(data.length == 0){
-                  $tableBody += '<tr><td colspan="7 text-center">No data available</td></tr>';
+                  $tableBody += '<tr><td colspan="8" class="text-center">No data available</td></tr>';
                 }else{
+
                   for($z = 0; $z < data.length; $z++){
 
                     $entryPrice = data[$z].entryPrice;
@@ -2254,30 +2350,56 @@ $dateTo = date('m/d/Y');
                     $pnl = data[$z].pnl;
                     $status = data[$z].status;
                     $pair = data[$z].pair;
+                    $cost = data[$z].trade_percentage_amount;
+                    $tradePercentCut = data[$z].trade_percent_cut;
+                    if($tradePercentCut == 15){
+                      $rebateText = "";
+                      $spacer = "";
+                    }else{
+                      $rebateText = "";
+                      $spacer = "";
+                    }
                     if($status == 'win'){
                       $textClass = 'text-success';
                       $pnl = '+'+$pnl;
                     }else if($status == 'even'){
                       $textClass = 'text-default';
                       $pnl = 0;
-                    }
-                    else{
+                    }else if($status == 'Deposit' || $status == 'Withdraw'){
+                      $textClass = 'text-default';
+                    }else{
                       $textClass = 'text-danger';
                       $pnl = '-'+$pnl;
                     }
+                    if($status == 'win' || $status == 'lost'){
+                      $totalPnl += parseFloat($pnl);
+                    }
+
                     $tableBody += '<tr>'
-                                  +'<td>'+ $entryPrice + '</td>'
-                                  +'<td>'+ $position + '</td>'
-                                  +'<td>'+ $entryTime + '</td>'
-                                  +'<td>'+ $lvrg + '</td>'
-                                  +'<td>'+ $exitPrice + '</td>'
-                                  +'<td>'+ $exitTime + '</td>'
-                                  +'<td>'+ $pair + '</td>'
-                                  +'<td class="'+$textClass+'">'+ $pnl + '</td>'
+                                  +'<td>'+$spacer+ $entryPrice + '</td>'
+                                  +'<td>'+$spacer+ $position + '</td>'
+                                  +'<td>'+$spacer+ $entryTime + '</td>'
+                                  +'<td>'+ $rebateText+$lvrg + '</td>'
+                                  +'<td>'+ $rebateText+$exitPrice + '</td>'
+                                  +'<td>'+$spacer+ $exitTime + '</td>'
+                                  +'<td>'+$spacer+ $pair + '</td>'
+                                  +'<td>'+$spacer+ $cost + '</td>'
+                                  +'<td class="'+$textClass+'">'+$spacer+ $pnl + '</td>'
                                 +'</tr>';
                   }
 
                 }
+
+                $totalPnlClass = 'text-success';
+                $totalPnlSymbol = '+';
+                if($totalPnl < 0){
+                  $totalPnlClass = 'text-danger';
+                  $totalPnlSymbol = '';
+                }else if($totalPnl == 0){
+                  $totalPnlClass = '';
+                  $totalPnlSymbol = '';
+                }
+                $('.totalPnL').html('<span class="'+$totalPnlClass +'">'+$totalPnlSymbol+$totalPnl+'</span>');
 
                 $('#tradeHistoryBody').html($tableBody);
 
@@ -2287,49 +2409,12 @@ $dateTo = date('m/d/Y');
         });
 
 
-        // switch
 
-        elem.onchange = function() {
-          $c = parseFloat($('.current_price').text());
-          $balance = parseFloat($('.userFunds').text());
-          $tradeAmount = parseFloat($('#leverage').val());
-          if(elem.checked == true){
-            $('.leverage-display').css('display', 'block');
-            $b = $balance * 10000;
-            $t = $tradeAmount * 10000;
-          }else{
-            $('.leverage-display').css('display', 'none');
-            $b = $balance / 10000;
-            $t = $tradeAmount / 10000;
-          }
-          $('.userFunds').text($b);
-          $('#leverage').val($t);
+    });
 
-
-          $('.trade-investment').each(function(index, key){
-            $v = parseFloat($(this).text());
-            if(elem.checked == true){
-              $(this).text($v * 10000);
-            }else{
-              $(this).text($v / 10000);
-            }
-          });
-
-          $('.trade-payout').each(function(index, key){
-            $v = parseFloat($(this).text());
-            if(elem.checked == true){
-              $(this).text($v * 10000);
-            }else{
-              $p = $v / 10000;
-              $(this).text($p.toPrecise(6));
-            }
-          });
-
-
-        };
-
-      });
-
+      setInterval(function(){
+        addRect($tracks);
+      }, 500);
 
       function addRect($tracks){
         $.each($tracks, function(index, key){
@@ -2444,7 +2529,50 @@ $dateTo = date('m/d/Y');
         //  console.log($year+'-'+$month+'-'+$day+' '+$hour+':'+$minute+':00');
         return $year+'-'+$month+'-'+$day+' '+$hour+':'+$minute+':00';
       }
+
+      function getRandomInt(min = -10, max = 10) {
+          return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function getUserById($id){
+        $.ajax({
+            url: '../Controller/user.php?action=get-user-by-id',
+            type: 'post',
+            dataType: 'json',
+            success: function (rsp) {
+                $tradePercentageAmount = rsp.balanceStatus.trade_percentage_amount;
+                $balanceId = rsp.balanceStatus.id;
+            },
+            data: {param: {id: $id, admin: 0}}
+        });
+      }
+
+      function checkATU($userId, $amount, $action, $coin, $transactionId){
+        $.ajax({
+            url: '../Controller/user.php?action=atu',
+            type: 'post',
+            dataType: 'json',
+            success: function (rsp) {
+                if(rsp == true){
+                  atuEnabled = true;
+                }
+            },
+            data: {param: {userId:$userId, amount: $amount, action: $action, coin:$coin, transactionId: $transactionId}}
+        });
+      }
+      function updateATU($userId, $tradeId){
+        $.ajax({
+            url: '../Controller/user.php?action=update-atu',
+            type: 'post',
+            dataType: 'json',
+            success: function (rsp) {
+
+            },
+            data: {param: {userId:$userId, transactionId: $tradeId}}
+        });
+      }
 </script>
+
 
 </body>
 </html>

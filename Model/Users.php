@@ -229,9 +229,18 @@ class Users extends History
     public function getPendingTradesFunction($data){
         $timeNow = time();
         $pdo = $this->getPdo();
-        $sql = 'SELECT * FROM `trades` WHERE `user` = '.$data['userId'].' AND `closing_time` >= '.$timeNow.'';
+        $sql = 'SELECT * FROM `trades` WHERE `user` = '.$data['userId'].' AND `closing_time` >= '.$timeNow.''; 
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
+        $cnt = $stmt->fetchColumn(); 
+        if($cnt == "") {
+	          $sql = 'SELECT *
+                  FROM `trades` WHERE `user` = ' .$data['userId'].' ORDER BY `id` DESC LIMIT 50';
+    	      $stmt = $pdo->prepare($sql);
+    	      ini_set('memory_limit', '-1');
+    	      $stmt->execute();
+	      }
+	      
         $result = array();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $row['remaining'] = $row['closing_time'] - $timeNow;

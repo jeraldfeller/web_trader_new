@@ -63,6 +63,50 @@ font-size:18px;
   letter-spacing:2px;
 }
 
+.modal-header, .modal-body,.modal-footer{
+	border:transparent;
+	background: #fff;
+}
+.modal-body{
+	padding: 0 50px;
+}
+
+.modal-body a p {
+	color:#4d4d4d;
+}
+.pull-center{
+	text-align: center;
+}
+#myModal .modal-body h1{
+	padding-top: 40px;
+	text-align: center;
+	color:#0ab774;
+	font-size:50px;
+	font-weight: bold;
+
+}
+#myModal .modal-body p{
+	text-align: center;
+	padding-top:40px;
+	font-weight: bold;
+
+}
+#myModal .modal-body form{
+	width: 60%;
+	margin: 0 auto;
+	padding-top: 40px;
+	padding-bottom: 80px;
+
+}
+.modal-body a p span{
+font-size: 12px;
+}
+.modal-body a p i, .modal-footer a{
+color:#0ab774;
+}
+
+
+
 .btn-mine { 
     font-family: 'din';
 	padding: 11px 30px;
@@ -75,6 +119,14 @@ font-size:18px;
 
 
     
+}
+
+ .btn-mine1{
+	padding: 11px 30px;
+	font-size:16px;
+	color: #fff;
+	background: #0ab774;
+  
 }
 
 .logform{
@@ -112,9 +164,30 @@ font-size:18px;
     min-height:220px;
     
  }
+ .submitform{
+    width:330px!important;
+}
 }
 
 @media only screen and (min-width: 321px) and (max-width: 479px) {
+    
+    .popform{
+     margin-left:-40px;
+    margin-right:-40px;
+      padding-left:-40px;
+    padding-right:-40px;
+}
+.submitform{
+    width:330px!important;
+}
+.submitform .btn-mine1{
+   padding-left: 5px;
+   padding-right: 5px;
+    margin-left:5px;
+    margin-right:5px;
+    font-size:15px;
+}
+
     
     .login-header-text{
  margin-left:-15px;

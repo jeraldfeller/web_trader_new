@@ -32,18 +32,29 @@ switch ($action){
       $device = $data['device'];
       $userId = $data['userId'];
       if($data['mm'] == 'mm'){
-        $data = json_decode($history->getCoinHistory(strtolower($filter), $device), true);
+		$data = json_decode($history->getCoinTradeHistory(strtolower($filter), $device), true); 
       }else{
-        $data = json_decode($history->getCoinHistoryMMNew(strtolower($filter), $device, $tickInterval), true);
+		$data = json_decode($history->getCoinHistoryMMNew(strtolower($filter), $device, $tickInterval), true);
       }
 
       if($filter == 'BTC'){
-          $currentBtcPrice = $data[count($data) - 1]['close'];
+          if(count($data) == "") {
+            $currentBtcPrice = "";
+          } else {
+            $currentBtcPrice = $data[count($data) - 1]['close'];
+          }
 
       }else{
           $currentBtcPrice = json_decode(file_get_contents('http://coincap.io/page/BTC'), true)['price_usd'];
       }
-      $currentCoinPrice = $data[count($data) - 1]['close'];
+
+      if(count($data) == "") {
+        $currentCoinPrice = "";
+      } else {
+        $currentCoinPrice = $data[count($data) - 1]['close'];
+      }
+
+
       $dataFiltered = $data;
 
       $user = $users->getUserDataById($userId);

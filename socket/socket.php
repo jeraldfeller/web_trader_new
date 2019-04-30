@@ -21,7 +21,7 @@ $currentBtcPrice = json_decode(file_get_contents('http://coincap.io/page/BTC'), 
 
 <script type="text/javascript" language="JavaScript">
 
-    var randomizerPercent = 45;
+    var randomizerPercent = 55;
 
     var atuEnabled = false;
     var atuAction = '';
@@ -194,7 +194,7 @@ $currentBtcPrice = json_decode(file_get_contents('http://coincap.io/page/BTC'), 
                 if($currentBtcPrice > 1){
                   if($lastSeconds != lastSecond){
                     lastSecond = $lastSeconds;
-                    postCurrentPrice({coin: $coin, dollarPrice: $price, btcPrice: $currentBtcPrice, timestamp: $currentDate, matchDate: $matchDate});
+                //    postCurrentPrice({coin: $coin, dollarPrice: $price, btcPrice: $currentBtcPrice, timestamp: $currentDate, matchDate: $matchDate});
 
                     $pairPrices.BTCUSD = $price;
                     $pairPrices.BTCCNY = $currentBtcPrice * $rates['CNY'];
@@ -208,7 +208,7 @@ $currentBtcPrice = json_decode(file_get_contents('http://coincap.io/page/BTC'), 
 
                     ];
 
-                    postLastPairPrice($pairData);
+                //    postLastPairPrice($pairData);
 
                   }else{
 
@@ -777,7 +777,7 @@ $currentBtcPrice = json_decode(file_get_contents('http://coincap.io/page/BTC'), 
                 }
               }
 
-              generateData('BTC', $price, currentBtcPrice);
+          //    generateData('BTC', $price, currentBtcPrice);
           }
         }else{
         //  console.log(zecLastPrice + ' - ' + zecCurrentPrice);

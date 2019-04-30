@@ -29,11 +29,13 @@ class History
       return json_encode($row);
     }
     public function getCoinHistory($coin, $device){
+        //$minuteGroup = array();
 
         if($device == 'mobile'){
-          $dateBefore = date('Y-m-d H:i:s', strtotime('-120 minutes'));
+            $dateBefore = date('Y-m-d H:i:s', strtotime('-120 minutes'));
         }else if($device == 'desktop'){
-          $dateBefore = date('Y-m-d H:i:s', strtotime('-250 minutes'));
+          //$dateBefore = date('Y-m-d H:i:s', strtotime('-250 minutes'));
+          $dateBefore = date('Y-m-d H:i:s', strtotime('-1 days'));
         }else{
           $dateBefore = date('Y-m-d H:i:s', strtotime('-2 minutes'));
           $dateAfter = date('Y-m-d H:i:s', strtotime('-1 minutes'));
@@ -45,22 +47,53 @@ class History
           $sql = 'SELECT *
                   FROM `'.$coin.'_table`
                   WHERE `timestamp` >= "'.$dateBefore.'" && `timestamp` < "'.$dateAfter.'"';
+
           $stmt = $pdo->prepare($sql);
+          ini_set('memory_limit', '-1');
           $stmt->execute();
+
+          /* Edited on 22-12-2018 */
+          $cnt = $stmt->fetchColumn();
+          if($cnt == "") {
+	          $sql = 'SELECT *
+                  FROM `'.$coin.'_table`
+                  ORDER BY `id` DESC LIMIT 500';
+    	      $stmt = $pdo->prepare($sql);
+    	      ini_set('memory_limit', '-1');
+    	      $stmt->execute();
+	      }
+          /* Edited on 22-12-2018 */
+
           $result = array();
           $group = array();
         }else{
           $sql = 'SELECT *
                   FROM `'.$coin.'_table`
                   WHERE `timestamp` > "'.$dateBefore.'"';
-          $stmt = $pdo->prepare($sql);
-          $stmt->execute();
+
+	      $stmt = $pdo->prepare($sql);
+	      ini_set('memory_limit', '-1');
+	      $stmt->execute();
+
+	      /* Edited on 22-12-2018 */
+	      $cnt = $stmt->fetchColumn();
+	      if($cnt == "") {
+	          $sql = 'SELECT *
+                  FROM `'.$coin.'_table`
+                  ORDER BY `id` DESC LIMIT 500';
+    	      $stmt = $pdo->prepare($sql);
+    	      ini_set('memory_limit', '-1');
+    	      $stmt->execute();
+	      }
+	      /* Edited on 22-12-2018 */
+
           $result = array();
           $group = array();
         }
 
 
 
+        $minuteGroup = array();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
             $timestampGroup = explode(' ', $row['timestamp']);
@@ -88,6 +121,102 @@ class History
                     'max' => $ohcl[1],
                     'min' => $ohcl[2],
                     'close' => $ohcl[3]
+                );
+
+              }
+
+
+        }
+        return json_encode(array_values($minuteGroup));
+    }
+
+
+    public function getCoinTradeHistory($coin, $device){
+        //$minuteGroup = array();
+
+        if($device == 'mobile'){
+            $dateBefore = date('Y-m-d H:i:s', strtotime('-120 minutes'));
+        }else if($device == 'desktop'){
+          //$dateBefore = date('Y-m-d H:i:s', strtotime('-250 minutes'));
+          $dateBefore = date('Y-m-d H:i:s', strtotime('-1 days'));
+        }else{
+          $dateBefore = date('Y-m-d H:i:s', strtotime('-2 minutes'));
+          $dateAfter = date('Y-m-d H:i:s', strtotime('-1 minutes'));
+        }
+
+
+        $pdo = $this->getPdo();
+        if($device == 'api'){
+          $sql = 'SELECT *
+                  FROM `btc_eth_table`
+                  WHERE `timestamp` >= "'.$dateBefore.'" && `timestamp` < "'.$dateAfter.'"';
+
+          $stmt = $pdo->prepare($sql);
+          ini_set('memory_limit', '-1');
+          $stmt->execute();
+
+          /* Edited on 22-12-2018 */
+          $cnt = $stmt->fetchColumn();
+          if($cnt == "") {
+	          $sql = 'SELECT *
+                    FROM `btc_eth_table`
+                  ORDER BY `id` DESC LIMIT 500';
+    	      $stmt = $pdo->prepare($sql);
+    	      ini_set('memory_limit', '-1');
+    	      $stmt->execute();
+	      }
+          /* Edited on 22-12-2018 */
+
+          $result = array();
+          $group = array();
+        }else{
+          $sql = 'SELECT *
+                    FROM `btc_eth_table`
+                  WHERE `timestamp` > "'.$dateBefore.'"';
+
+	      $stmt = $pdo->prepare($sql);
+	      ini_set('memory_limit', '-1');
+	      $stmt->execute();
+
+	      /* Edited on 22-12-2018 */
+	      $cnt = $stmt->fetchColumn();
+	      if($cnt == "") {
+	          $sql = 'SELECT *
+                    FROM `btc_eth_table`
+                  ORDER BY `id` DESC LIMIT 500';
+    	      $stmt = $pdo->prepare($sql);
+    	      ini_set('memory_limit', '-1');
+    	      $stmt->execute();
+	      }
+	      /* Edited on 22-12-2018 */
+
+          $result = array();
+          $group = array();
+        }
+        $minuteGroup = array();
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+
+            $timestampGroup = explode(' ', $row['timestamp']);
+            $timestampHourMin = explode(':', $timestampGroup[1]);
+            $timestamp = $timestampGroup[0].'T'.$timestampHourMin[0].':'.$timestampHourMin[1].':00.000Z';
+
+              if(isset($minuteGroup[$timestamp])){
+
+                $minuteGroup[$timestamp] = array(
+                    'timestamp' => $row['timestamp'],
+                    'open' => $row['open'],
+                    'max' => $row['high'],
+                    'min' => $row['low'],
+                    'close' => $row['close']
+                );
+              }else{
+
+                $minuteGroup[$timestamp] = array(
+                    'timestamp' => $row['timestamp'],
+                    'open' => $row['open'],
+                    'max' => $row['high'],
+                    'min' => $row['low'],
+                    'close' => $row['close']
                 );
 
               }

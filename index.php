@@ -6,13 +6,21 @@
         <link rel="shortcut icon" href="https://www.nanopips.com/img/favicon.ico" type="image/x-icon" />
         
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" >
+    
+    
+    <link href="css/font-awesome.min.css" rel="stylesheet" >
+    
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link href="assets/css/main.css?v=2.0" rel="stylesheet" >
     <link href="custom.css" rel="stylesheet" >
 
+
 </head>
+
 <body class="login-bg">
+    <?php require_once("popmain.php") ?>
+	
     
     <header>
 			
@@ -41,6 +49,10 @@
 	
 </nav>
     </header>
+    
+    	<h4 align="center" class="redtext1 pull-center" style="color:red;text-align:center;"><b></b><br><br>Thank you we’ll email you shortly.<br> Make sure to add our email to your safe list.</b></h4> 
+		
+		
     
     
   <!--<nav class="navbar navbar-default navbar-static-top login-navbar">
@@ -154,6 +166,35 @@
 
   gtag('config', 'UA-127217195-1');
 </script>
+
+
+
+<script type="text/javascript">
+
+
+   $('.redtext1').hide();
+
+</script>
+
+ <script type="text/javascript">
+  <?php if($_GET['confirm'] == "active") { ?>
+  
+  	$(document).ready(function(){
+   $("#myModal").modal('hide');
+    	});
+    $('.redtext1').show().delay(2800).fadeOut(2000);
+    
+  <?php } else { ?>
+  
+  	$(document).ready(function(){
+	    	$("#myModal").modal('show');
+	    	$('#myModal').modal({backdrop: 'static', keyboard: false})  
+	        });
+  
+  <?php } ?>
+
+</script>
+
 
 </body>
 </html>

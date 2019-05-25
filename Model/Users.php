@@ -229,18 +229,19 @@ class Users extends History
     public function getPendingTradesFunction($data){
         $timeNow = time();
         $pdo = $this->getPdo();
-        $sql = 'SELECT * FROM `trades` WHERE `user` = '.$data['userId'].' AND `closing_time` >= '.$timeNow.''; 
+        // $sql = 'SELECT * FROM `trades` WHERE `user` = '.$data['userId'].' AND `closing_time` >= '.$timeNow.'';
+        $sql = 'SELECT * FROM `trades` WHERE `user` = '.$data['userId'].' AND `status` = "live"';
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
-        $cnt = $stmt->fetchColumn(); 
-        if($cnt == "") {
-	          $sql = 'SELECT *
-                  FROM `trades` WHERE `user` = ' .$data['userId'].' ORDER BY `id` DESC LIMIT 50';
-    	      $stmt = $pdo->prepare($sql);
-    	      ini_set('memory_limit', '-1');
-    	      $stmt->execute();
-	      }
-	      
+        // if($cnt == "") {
+	      //     $sql = 'SELECT *
+        //           FROM `trades` WHERE `user` = ' .$data['userId'].' ORDER BY `id` DESC LIMIT 50';
+    	  //     $stmt = $pdo->prepare($sql);
+    	  //     ini_set('memory_limit', '-1');
+    	  //     $stmt->execute();
+	      // }
+
+
         $result = array();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $row['remaining'] = $row['closing_time'] - $timeNow;
@@ -275,8 +276,8 @@ class Users extends History
     public function userUpdateTradesFunction($data){
         $dateTime = date('Y-m-d H:i:s');
         $pdo = $this->getPdo();
-        $historyData = json_decode($this->getCoinHistory(strtolower('BTC'), 'desktop'), true);
-        $currentBtcPrice = $historyData[count($data) - 1]['close'];
+        // $historyData = json_decode($this->getCoinHistory(strtolower('BTC'), 'desktop'), true);
+        // $currentBtcPrice = $historyData[count($data) - 1]['close'];
         $winningAmount = $data['winAmount'];
         $losingAmount = $data['leverage'];
         // update funds
@@ -309,7 +310,7 @@ class Users extends History
         $sql = 'DELETE FROM `atu` WHERE `transaction_id` = '.$data['tradeId'];
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
-      
+
         if($user['dollar_amount'] <= 10){
           // get the overall total Balance
           $sql = 'SELECT SUM(`amount`) as totalBalanceAmount FROM `users_balance` WHERE `user_id` ='.$data['userId'];

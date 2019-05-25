@@ -204,6 +204,7 @@ class History
 
                 $minuteGroup[$timestamp] = array(
                     'timestamp' => $row['timestamp'],
+                    'period' => strtotime($row['timestamp']) * 1000,
                     'open' => $row['open'],
                     'max' => $row['high'],
                     'min' => $row['low'],
@@ -213,6 +214,7 @@ class History
 
                 $minuteGroup[$timestamp] = array(
                     'timestamp' => $row['timestamp'],
+                    'period' => strtotime($row['timestamp']) * 1000,
                     'open' => $row['open'],
                     'max' => $row['high'],
                     'min' => $row['low'],
